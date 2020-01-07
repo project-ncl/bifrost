@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -64,8 +65,8 @@ public class ElasticSearch {
      * Method returns when all the lines are fetched.
      */
     public void get(
-            Map<String, String> matchFilters,
-            Map<String, String> prefixFilters,
+            Map<String, List<String>> matchFilters,
+            Map<String, List<String>> prefixFilters,
             Optional<Line> searchAfter,
             Direction direction,
             int fetchSize,
@@ -162,10 +163,26 @@ public class ElasticSearch {
         }
     }
 
-    private BoolQueryBuilder getQueryBuilder(Map<String, String> matchFilters, Map<String, String> prefixFilters) {
+    private BoolQueryBuilder getQueryBuilder(Map<String, List<String>> matchFilters, Map<String, List<String>> prefixFilters) {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        matchFilters.forEach((name, text) -> queryBuilder.must(QueryBuilders.matchQuery(name, text)));
-        prefixFilters.forEach((name, text) -> queryBuilder.must(QueryBuilders.prefixQuery(name, text)));
+
+        matchFilters.forEach((field, values) -> {
+            BoolQueryBuilder matchBuilder = QueryBuilders.boolQuery();
+            values.forEach(value -> {
+                matchBuilder.should(QueryBuilders.matchPhraseQuery(field, value));
+            });
+            matchBuilder.minimumShouldMatch(1);
+            queryBuilder.must().add(matchBuilder);
+        });
+
+        prefixFilters.forEach((field, values) -> {
+            BoolQueryBuilder prefixBuilder = QueryBuilders.boolQuery();
+            values.forEach(value -> {
+                prefixBuilder.should(QueryBuilders.matchPhrasePrefixQuery(field, value));
+            });
+            prefixBuilder.minimumShouldMatch(1);
+            queryBuilder.must().add(prefixBuilder);
+        });
         return queryBuilder;
     }
 }
