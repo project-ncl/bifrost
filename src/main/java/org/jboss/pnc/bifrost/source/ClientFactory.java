@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,15 +48,15 @@ public class ClientFactory {
 
             RestClientBuilder builder = RestClient.builder(hosts);
 
-            String keyStorePath = config.getKeyStorePath();
-            if (keyStorePath != null && !keyStorePath.equals("")) {
+            Optional<String> keyStorePath = config.getKeyStorePath();
+            if (keyStorePath.isPresent()) {
                 KeyStore truststore = KeyStore.getInstance("PKCS12"); // or jks in case jks file is used
-                try (InputStream is = Files.newInputStream(Paths.get(keyStorePath))) {
-                    truststore.load(is, config.getKeyStorePass().toCharArray());
+                try (InputStream is = Files.newInputStream(Paths.get(keyStorePath.get()))) {
+                    truststore.load(is, config.getKeyStorePass().get().toCharArray());
                 }
                 SSLContextBuilder sslBuilder = SSLContexts.custom()
                         .loadTrustMaterial(truststore, new TrustSelfSignedStrategy())
-                        .loadKeyMaterial(truststore, config.getKeyPass().toCharArray());
+                        .loadKeyMaterial(truststore, config.getKeyPass().get().toCharArray());
                 final SSLContext sslContext = sslBuilder.build();
 
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {

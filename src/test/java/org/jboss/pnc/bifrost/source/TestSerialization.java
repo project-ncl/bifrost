@@ -1,6 +1,6 @@
 package org.jboss.pnc.bifrost.source;
 
-import io.quarkus.arc.ParameterizedTypeImpl;
+import io.quarkus.arc.impl.ParameterizedTypeImpl;
 import org.jboss.logging.Logger;
 import org.jboss.pnc.bifrost.endpoint.websocket.Result;
 import org.jboss.pnc.bifrost.endpoint.websocket.SubscribeResultDto;

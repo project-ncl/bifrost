@@ -3,6 +3,7 @@ package org.jboss.pnc.bifrost.source;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -16,14 +17,14 @@ public class ElasticSearchConfig {
     @ConfigProperty(name = "elasticsearch.indexes")
     String indexes;
 
-    @ConfigProperty(name = "elasticsearch.keyStorePath", defaultValue = "")
-    String keyStorePath;
+    @ConfigProperty(name = "elasticsearch.keyStorePath")
+    Optional<String> keyStorePath;
 
-    @ConfigProperty(name = "elasticsearch.keyStorePass", defaultValue = "")
-    String keyStorePass;
+    @ConfigProperty(name = "elasticsearch.keyStorePass")
+    Optional<String> keyStorePass;
 
-    @ConfigProperty(name = "elasticsearch.keyPass", defaultValue = "")
-    String keyPass;
+    @ConfigProperty(name = "elasticsearch.keyPass")
+    Optional<String> keyPass;
 
     public String getHosts() {
         return hosts;
@@ -33,38 +34,20 @@ public class ElasticSearchConfig {
         return indexes;
     }
 
-    public String getKeyStorePath() {
+    public Optional<String> getKeyStorePath() {
         return keyStorePath;
     }
 
-    public String getKeyStorePass() {
+    public Optional<String> getKeyStorePass() {
         return keyStorePass;
     }
 
-    public String getKeyPass() {
+    public Optional<String> getKeyPass() {
         return keyPass;
     }
 
-    //    private ElasticSearchConfig(Builder builder) {
-//        hosts = builder.hosts;
-//        indexes = builder.indexes;
-//        keyStorePath = builder.keyStorePath;
-//        keyStorePass = builder.keyStorePass;
-//        keyPass = builder.keyPass;
-//    }
-
     public static Builder newBuilder() {
         return new Builder();
-    }
-
-    public static Builder newBuilder(ElasticSearchConfig copy) {
-        Builder builder = new Builder();
-        builder.hosts = copy.getHosts();
-        builder.indexes = copy.getIndexes();
-        builder.keyStorePath = copy.getKeyStorePath();
-        builder.keyStorePass = copy.getKeyStorePass();
-        builder.keyPass = copy.getKeyPass();
-        return builder;
     }
 
     public static final class Builder {
@@ -107,16 +90,13 @@ public class ElasticSearchConfig {
             return this;
         }
 
-        //        public ElasticSearchConfig build() {
-        //            return new ElasticSearchConfig(this);
-        //        }
         public ElasticSearchConfig build() {
             ElasticSearchConfig elasticSearchConfig = new ElasticSearchConfig();
             elasticSearchConfig.hosts = hosts;
             elasticSearchConfig.indexes = indexes;
-            elasticSearchConfig.keyStorePath = keyStorePath;
-            elasticSearchConfig.keyStorePass = keyStorePass;
-            elasticSearchConfig.keyPass = keyPass;
+            elasticSearchConfig.keyStorePath = Optional.ofNullable(keyStorePath);
+            elasticSearchConfig.keyStorePass = Optional.ofNullable(keyStorePass);
+            elasticSearchConfig.keyPass = Optional.ofNullable(keyPass);
             return elasticSearchConfig;
         }
     }
