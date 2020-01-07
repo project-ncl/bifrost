@@ -15,15 +15,15 @@ import javax.enterprise.context.ApplicationScoped;
 public class BackOffRunnableConfig {
 
     @ConfigProperty(name = "bifrost.backoffrunnable.delayMillis")
-    private long delayMillis;
+    long delayMillis;
 
     @ConfigProperty(name = "bifrost.backoffrunnable.maxBackOffCycles")
-    private long maxBackOffCycles;
+    long maxBackOffCycles;
 
     @ConfigProperty(name = "bifrost.backoffrunnable.timeOutMillis")
-    private long timeOutMillis;
+    long timeOutMillis;
 
     @ConfigProperty(name = "bifrost.backoffrunnable.pollIntervalMillis")
-    private long pollIntervalMillis;
+    long pollIntervalMillis;
 
 }

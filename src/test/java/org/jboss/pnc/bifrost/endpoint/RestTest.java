@@ -8,7 +8,6 @@ import org.jboss.pnc.bifrost.source.dto.Direction;
 import org.jboss.pnc.bifrost.source.dto.Line;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +39,17 @@ public class RestTest {
     @Inject
     DataProviderMock dataProvider;
 
-    @BeforeAll
-    public static void init() {
+    /*
+    WORKAROUND: use static block instead of BeforeAll to avoid the exception below
+    The IllegalStateException happens when this test is run the first, if any other test run before it works
+
+    java.lang.ExceptionInInitializerError
+       at org.jboss.pnc.bifrost.endpoint.RestTest.init(RestTest.java:45)
+     Caused by: java.lang.IllegalStateException: No configuration is available for this class loader
+	   at org.jboss.pnc.bifrost.endpoint.RestTest.init(RestTest.java:45)
+     */
+    //@BeforeAll
+    static {
         Client client = ClientBuilder.newClient();
         target = client.target("http://localhost:8081/");
     }

@@ -15,13 +15,13 @@ import javax.enterprise.context.ApplicationScoped;
 public class Config {
 
     @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "100")
-    private int defaultSourceFetchSize;
+    int defaultSourceFetchSize;
 
     @ConfigProperty(name = "bifrost.maxSourceFetchSize", defaultValue = "1000")
-    private int maxSourceFetchSize;
+    int maxSourceFetchSize;
 
     @ConfigProperty(name = "bifrost.sourcePollThreads", defaultValue = "4")
-    private int sourcePollThreads;
+    int sourcePollThreads;
 
 
 }
