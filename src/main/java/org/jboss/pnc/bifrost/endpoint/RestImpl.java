@@ -7,16 +7,21 @@ import org.jboss.pnc.bifrost.common.scheduler.TimeoutExecutor;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.jboss.pnc.bifrost.source.dto.Direction;
 import org.jboss.pnc.bifrost.source.dto.Line;
+import org.jboss.pnc.bifrost.source.dto.MetaData;
+import org.jboss.pnc.common.security.Md5;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -182,6 +187,37 @@ public class RestImpl implements Rest {
                 Optional.ofNullable(maxLines),
                 onLine);
         return lines;
+    }
+
+    @Override
+    public MetaData getMetaData(String matchFilters,
+            String prefixFilters,
+            Line afterLine,
+            Direction direction,
+            Integer maxLines) throws IOException {
+
+        try {
+            Md5 md5 = new Md5();
+            Consumer<Line> onLine = line -> {
+                try {
+                    md5.add(line.getMessage());
+                } catch (UnsupportedEncodingException e) {
+                    logger.error(e);
+                }
+            };
+            dataProvider.get(
+                    matchFilters,
+                    prefixFilters,
+                    Optional.ofNullable(afterLine),
+                    direction,
+                    Optional.ofNullable(maxLines),
+                    onLine);
+            return new MetaData(md5.digest());
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e);
+            throw new ServerErrorException(e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @Override

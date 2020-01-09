@@ -2,6 +2,7 @@ package org.jboss.pnc.bifrost.endpoint;
 
 import org.jboss.pnc.bifrost.source.dto.Direction;
 import org.jboss.pnc.bifrost.source.dto.Line;
+import org.jboss.pnc.bifrost.source.dto.MetaData;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -36,6 +37,17 @@ public interface Rest {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     List<Line> getLines(
+            @QueryParam("matchFilters") String matchFilters,
+            @QueryParam("prefixFilters") String prefixFilters,
+            @QueryParam("afterLine") Line afterLine,
+            @QueryParam("direction") Direction direction,
+            @QueryParam("maxLines") Integer maxLines)
+            throws IOException;
+
+    @GET
+    @Path("/metadata")
+    @Produces(MediaType.APPLICATION_JSON)
+    MetaData getMetaData(
             @QueryParam("matchFilters") String matchFilters,
             @QueryParam("prefixFilters") String prefixFilters,
             @QueryParam("afterLine") Line afterLine,
