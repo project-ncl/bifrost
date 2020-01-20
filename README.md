@@ -32,6 +32,13 @@ Query parameters
 
 \* key:value query: *key* is a field name, *value* is a matching string, for 'OR' matching  multiple values can be defined with '|'   
 
+**Log messages checksum**
+
+Path: /metadata
+
+Same query parameters as for the *Json formatted log lines*.
+
+
 **Examples query**
 
 ```
