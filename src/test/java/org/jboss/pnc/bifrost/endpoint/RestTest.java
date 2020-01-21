@@ -62,7 +62,8 @@ public class RestTest {
         List<Line> mockLines = rest.getLines("", "", null, Direction.ASC, 10);
         mockLines.forEach(line -> System.out.println(line.asString()));
         Assertions.assertEquals(5, mockLines.size());
-        Assertions.assertEquals("abc123", mockLines.get(0).getCtx());
+        Assertions.assertEquals("abc123", mockLines.get(0).getMdc().get("processContext"));
+
     }
 
     @Test

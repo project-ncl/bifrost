@@ -3,6 +3,7 @@ package org.jboss.pnc.bifrost.mock;
 import org.jboss.pnc.bifrost.source.dto.Line;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,15 +17,16 @@ public class LineProducer {
     }
 
     public static Line getLine(Integer lineNumber, boolean last, String ctx, String loggerName) {
+        var mdc = new HashMap<String, String>();
+        mdc.put("processContext", ctx);
+        mdc.put("tmp", "false");
         return Line.newBuilder()
                 .id(UUID.randomUUID().toString())
                 .timestamp(Long.toString(System.currentTimeMillis()))
                 .logger(loggerName)
                 .message("Message " + lineNumber)
                 .last(last)
-                .ctx(ctx)
-                .tmp(false)
-                .exp(null)
+                .mdc(mdc)
                 .build();
     }
 

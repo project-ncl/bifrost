@@ -48,7 +48,7 @@ public class TestSerialization {
 
         List<Line> deserializedLines = jsonb.fromJson(jsonLines, new ParameterizedTypeImpl(List.class, Line.class));
         Assertions.assertEquals(3, deserializedLines.size());
-        Assertions.assertEquals("abc123", deserializedLines.get(0).getCtx());
+        Assertions.assertEquals("abc123", deserializedLines.get(0).getMdc().get("processContext"));
     }
 
     @Test

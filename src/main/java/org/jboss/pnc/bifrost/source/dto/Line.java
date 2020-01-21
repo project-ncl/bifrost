@@ -7,6 +7,7 @@ import lombok.ToString;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbProperty;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -27,11 +28,7 @@ public class Line {
 
     private boolean last;
 
-    private String ctx;
-
-    private Boolean tmp;
-
-    private String exp;
+    private Map<String, String> mdc;
 
     private String subscriptionTopic;
 
@@ -51,9 +48,7 @@ public class Line {
         builder.loggerName = copy.getLoggerName();
         builder.message = copy.getMessage();
         builder.last = copy.isLast();
-        builder.ctx = copy.getCtx();
-        builder.tmp = copy.getTmp();
-        builder.exp = copy.getExp();
+        builder.mdc = copy.getMdc();
         return builder;
     }
 
@@ -81,11 +76,7 @@ public class Line {
 
         private boolean last;
 
-        private String ctx;
-
-        private Boolean tmp;
-
-        private String exp;
+        private Map<String, String> mdc;
 
         private Builder() {
         }
@@ -115,18 +106,8 @@ public class Line {
             return this;
         }
 
-        public Builder ctx(String ctx) {
-            this.ctx = ctx;
-            return this;
-        }
-
-        public Builder tmp(Boolean tmp) {
-            this.tmp = tmp;
-            return this;
-        }
-
-        public Builder exp(String exp) {
-            this.exp = exp;
+        public Builder mdc(Map<String,String> mdc) {
+            this.mdc = mdc;
             return this;
         }
 
@@ -137,9 +118,7 @@ public class Line {
             line.loggerName = this.loggerName;
             line.message = this.message;
             line.last = this.last;
-            line.ctx = this.ctx;
-            line.tmp = this.tmp;
-            line.exp = this.exp;
+            line.mdc = this.mdc;
             return line;
         }
     }

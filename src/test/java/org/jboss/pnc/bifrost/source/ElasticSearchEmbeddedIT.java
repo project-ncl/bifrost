@@ -142,7 +142,7 @@ public class ElasticSearchEmbeddedIT {
         Assertions.assertEquals(16, anyLines.size());
 
         Map<String, List<String>> matchFilters = new HashMap<>();
-        matchFilters.put("ctx.keyword", Arrays.asList("build-2"));
+        matchFilters.put("mdc.processContext.keyword", Arrays.asList("build-2"));
         List<Line> matchingLines = new ArrayList<>();
         Consumer<Line> onLine = (line -> {
             logger.info("Found line: " + line);

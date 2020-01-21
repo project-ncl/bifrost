@@ -129,12 +129,11 @@ public class ElasticSearch {
 
 //        String id = source.get("_type").toString() + "#" + source.get("_id").toString();
         String id =hit.getType() + "#" + hit.getId();
-        String timestamp = source.get("@timestamp").toString();
-        String logger = source.get("loggerName").toString();
-        String message = source.get("message").toString();
-        String ctx = getString(source, "mdc.processContext"); //TODO fix all fields
-        Boolean tmp = getBoolean(source, "tmp");
-        String expire = getString(source, "exp");
+        String timestamp = getString(source, "@timestamp");
+        String logger = getString(source, "loggerName");
+        String message = getString(source, "message");
+
+        Map<String, String> mdc = (Map<String, String>) source.get("mdc");
 
         return Line.newBuilder()
                 .id(id)
@@ -142,9 +141,7 @@ public class ElasticSearch {
                 .logger(logger)
                 .message(message)
                 .last(last)
-                .ctx(ctx)
-                .tmp(tmp)
-                .exp(expire)
+                .mdc(mdc)
                 .build();
     }
 
@@ -154,15 +151,6 @@ public class ElasticSearch {
             return null;
         } else {
             return obj.toString();
-        }
-    }
-
-    private Boolean getBoolean(Map<String, Object> source, String fieldName) {
-        Object obj = source.get(fieldName);
-        if (obj == null) {
-            return null;
-        } else {
-            return Boolean.parseBoolean(obj.toString());
         }
     }
 
