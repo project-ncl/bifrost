@@ -5,6 +5,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -72,7 +73,7 @@ public class ElasticSearch {
             int fetchSize,
             Consumer<Line> onLine) throws IOException {
         logger.debug("Searching matchFilters: {}, prefixFilters: {}, searchAfter: {}, direction: {}.", matchFilters, prefixFilters, searchAfter, direction);
-        BoolQueryBuilder queryBuilder = getQueryBuilder(matchFilters, prefixFilters);
+        QueryBuilder queryBuilder = getQueryBuilder(matchFilters, prefixFilters);
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder
@@ -92,6 +93,8 @@ public class ElasticSearch {
             //timestampRange.from(System.currentTimeMillis() - 5000); //TODO parametrize how long back
             //queryBuilder.must(timestampRange);
         }
+
+        logger.debug("Search query: " + queryBuilder);
 
         SearchRequest searchRequest = new SearchRequest(indexes);
         searchRequest.source(sourceBuilder);
@@ -129,7 +132,7 @@ public class ElasticSearch {
         String timestamp = source.get("@timestamp").toString();
         String logger = source.get("loggerName").toString();
         String message = source.get("message").toString();
-        String ctx = getString(source, "mdc.requestContext");
+        String ctx = getString(source, "mdc.processContext"); //TODO fix all fields
         Boolean tmp = getBoolean(source, "tmp");
         String expire = getString(source, "exp");
 
@@ -163,13 +166,13 @@ public class ElasticSearch {
         }
     }
 
-    private BoolQueryBuilder getQueryBuilder(Map<String, List<String>> matchFilters, Map<String, List<String>> prefixFilters) {
+    private QueryBuilder getQueryBuilder(Map<String, List<String>> matchFilters, Map<String, List<String>> prefixFilters) {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
 
         matchFilters.forEach((field, values) -> {
             BoolQueryBuilder matchBuilder = QueryBuilders.boolQuery();
             values.forEach(value -> {
-                matchBuilder.should(QueryBuilders.matchPhraseQuery(field, value));
+                matchBuilder.should(QueryBuilders.matchQuery(field, value));
             });
             matchBuilder.minimumShouldMatch(1);
             queryBuilder.must().add(matchBuilder);
@@ -178,7 +181,7 @@ public class ElasticSearch {
         prefixFilters.forEach((field, values) -> {
             BoolQueryBuilder prefixBuilder = QueryBuilders.boolQuery();
             values.forEach(value -> {
-                prefixBuilder.should(QueryBuilders.matchPhrasePrefixQuery(field, value));
+                prefixBuilder.should(QueryBuilders.prefixQuery(field, value));
             });
             prefixBuilder.minimumShouldMatch(1);
             queryBuilder.must().add(prefixBuilder);

@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -17,9 +18,10 @@ public class Line {
 
     private String id;
 
+    @JsonbProperty("@timestamp")
     private String timestamp;
 
-    private String logger;
+    private String loggerName;
 
     private String message;
 
@@ -46,7 +48,7 @@ public class Line {
         Builder builder = new Builder();
         builder.id = copy.getId();
         builder.timestamp = copy.getTimestamp();
-        builder.logger = copy.getLogger();
+        builder.loggerName = copy.getLoggerName();
         builder.message = copy.getMessage();
         builder.last = copy.isLast();
         builder.ctx = copy.getCtx();
@@ -56,7 +58,7 @@ public class Line {
     }
 
     public String asString() {
-        return getTimestamp() + " " + getLogger() + " " + getMessage();
+        return getTimestamp() + " " + getLoggerName() + " " + getMessage();
     }
 
 //    @JsonPOJOBuilder(withPrefix = "")
@@ -73,7 +75,7 @@ public class Line {
 
         private String timestamp;
 
-        private String logger;
+        private String loggerName;
 
         private String message;
 
@@ -99,7 +101,7 @@ public class Line {
         }
 
         public Builder logger(String logger) {
-            this.logger = logger;
+            this.loggerName = logger;
             return this;
         }
 
@@ -132,7 +134,7 @@ public class Line {
             Line line = new Line();
             line.id = this.id;
             line.timestamp = this.timestamp;
-            line.logger = this.logger;
+            line.loggerName = this.loggerName;
             line.message = this.message;
             line.last = this.last;
             line.ctx = this.ctx;
