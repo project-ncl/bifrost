@@ -14,7 +14,6 @@ import org.jboss.logging.Logger;
 import org.jboss.pnc.bifrost.mock.LineProducer;
 import org.jboss.pnc.bifrost.source.dto.Direction;
 import org.jboss.pnc.bifrost.source.dto.Line;
-import org.jboss.pnc.bifrost.test.ElasticsearchEmbeddedTest;
 import org.jboss.pnc.bifrost.test.Wait;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +37,6 @@ import java.util.function.Consumer;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @QuarkusTest //although no need to boot the applicaiton, the logging does not work without this annota
-@ElasticsearchEmbeddedTest
 public class ElasticSearchEmbeddedIT {
 
     private static Logger logger = Logger.getLogger(ElasticSearchEmbeddedIT.class);

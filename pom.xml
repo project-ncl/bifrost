@@ -13,7 +13,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.elasticSearch>5.6.15</version.elasticSearch>
     <elasticsearch.maven.plugin.version>6.10</elasticsearch.maven.plugin.version>
-    <excludeTags>debug-test,elasticsearch-test</excludeTags>
+    <excludeTags>debug-test</excludeTags>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -143,14 +143,61 @@
           <excludedGroups>${excludeTags}</excludedGroups>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.github.alexcojocaru</groupId>
+        <artifactId>elasticsearch-maven-plugin</artifactId>
+        <!-- REPLACE THE FOLLOWING WITH THE PLUGIN VERSION YOU NEED -->
+        <version>${elasticsearch.maven.plugin.version}</version>
+        <configuration>
+          <!-- REPLACE THE FOLLOWING WITH THE ELASTICSEARCH VERSION YOU NEED -->
+          <version>${version.elasticSearch}</version>
+          <clusterName>test</clusterName>
+          <transportPort>9300</transportPort>
+          <httpPort>9200</httpPort>
+        </configuration>
+        <executions>
+          <!--
+              The elasticsearch maven plugin goals are by default bound to the
+              pre-integration-test and post-integration-test phases
+          -->
+          <execution>
+            <id>start-elasticsearch</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>runforked</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop-elasticsearch</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${surefire-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <systemProperties>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+          </systemProperties>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
     <profile>
       <id>debug-test</id>
-      <properties>
-        <excludeTags>elasticsearch-test</excludeTags>
-      </properties>
     </profile>
     <profile>
       <id>native</id>
@@ -192,66 +239,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>elasticsearch-test</id>
-      <properties>
-        <excludeTags>debug-test</excludeTags>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.alexcojocaru</groupId>
-            <artifactId>elasticsearch-maven-plugin</artifactId>
-            <!-- REPLACE THE FOLLOWING WITH THE PLUGIN VERSION YOU NEED -->
-            <version>${elasticsearch.maven.plugin.version}</version>
-            <configuration>
-              <!-- REPLACE THE FOLLOWING WITH THE ELASTICSEARCH VERSION YOU NEED -->
-              <version>${version.elasticSearch}</version>
-              <clusterName>test</clusterName>
-              <transportPort>9300</transportPort>
-              <httpPort>9200</httpPort>
-            </configuration>
-            <executions>
-              <!--
-                  The elasticsearch maven plugin goals are by default bound to the
-                  pre-integration-test and post-integration-test phases
-              -->
-              <execution>
-                <id>start-elasticsearch</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>runforked</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>stop-elasticsearch</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>${surefire-plugin.version}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <systemProperties>
-                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-              </systemProperties>
-            </configuration>
           </plugin>
         </plugins>
       </build>
