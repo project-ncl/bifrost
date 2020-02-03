@@ -1,9 +1,9 @@
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
 import org.jboss.logging.Logger;
+import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
-import org.jboss.pnc.bifrost.source.dto.Line;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;

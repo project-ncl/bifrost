@@ -1,11 +1,12 @@
 package org.jboss.pnc.bifrost.endpoint;
 
 import io.quarkus.test.junit.QuarkusTest;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.api.bifrost.rest.Bifrost;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProviderMock;
 import org.jboss.pnc.bifrost.mock.LineProducer;
 import org.jboss.pnc.bifrost.source.RemoteConnectionTest;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class RestTest {
     @Test
     public void shouldGetLines() throws IOException {
         ResteasyWebTarget rtarget = (ResteasyWebTarget)target;
-        Rest rest = rtarget.proxy(Rest.class);
+        Bifrost rest = rtarget.proxy(Bifrost.class);
 
         List<Line> mockLines = rest.getLines("", "", null, Direction.ASC, 10);
         mockLines.forEach(line -> System.out.println(line.asString()));

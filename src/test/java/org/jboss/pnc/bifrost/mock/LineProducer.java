@@ -1,6 +1,6 @@
 package org.jboss.pnc.bifrost.mock;
 
-import org.jboss.pnc.bifrost.source.dto.Line;
+import org.jboss.pnc.api.bifrost.dto.Line;
 
 import java.util.ArrayList;
 import java.util.HashMap;

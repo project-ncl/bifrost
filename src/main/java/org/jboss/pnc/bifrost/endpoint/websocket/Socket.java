@@ -5,8 +5,8 @@ import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.logging.Logger;
+import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
-import org.jboss.pnc.bifrost.source.dto.Line;
 
 import javax.inject.Inject;
 import javax.websocket.OnClose;

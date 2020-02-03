@@ -2,10 +2,10 @@ package org.jboss.pnc.bifrost.source;
 
 import io.quarkus.arc.impl.ParameterizedTypeImpl;
 import org.jboss.logging.Logger;
+import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.endpoint.websocket.Result;
 import org.jboss.pnc.bifrost.endpoint.websocket.SubscribeResultDto;
 import org.jboss.pnc.bifrost.mock.LineProducer;
-import org.jboss.pnc.bifrost.source.dto.Line;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

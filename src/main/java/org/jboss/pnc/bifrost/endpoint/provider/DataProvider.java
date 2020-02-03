@@ -1,6 +1,8 @@
 package org.jboss.pnc.bifrost.endpoint.provider;
 
 import org.jboss.logging.Logger;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.Config;
 import org.jboss.pnc.bifrost.common.Reference;
 import org.jboss.pnc.bifrost.common.Strings;
@@ -9,8 +11,6 @@ import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
 import org.jboss.pnc.bifrost.source.ElasticSearch;
 import org.jboss.pnc.bifrost.source.ElasticSearchConfig;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;

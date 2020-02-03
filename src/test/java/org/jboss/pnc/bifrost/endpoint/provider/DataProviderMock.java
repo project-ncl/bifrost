@@ -1,8 +1,8 @@
 package org.jboss.pnc.bifrost.endpoint.provider;
 
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.mock.LineProducer;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
 
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;

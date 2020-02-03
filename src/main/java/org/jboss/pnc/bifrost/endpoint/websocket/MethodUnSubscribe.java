@@ -1,8 +1,8 @@
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
-import org.jboss.pnc.bifrost.source.dto.Line;
 
 import javax.inject.Inject;
 import java.util.function.Consumer;

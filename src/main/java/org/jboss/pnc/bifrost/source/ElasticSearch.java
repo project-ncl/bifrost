@@ -11,8 +11,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
+import org.elasticsearch.search.sort.SortOrder;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +81,8 @@ public class ElasticSearch {
                 .query(queryBuilder)
                 .size(fetchSize + 1)
                 .from(0)
-                .sort(new FieldSortBuilder("@timestamp").order(direction.getSortOrder()))
-                .sort(new FieldSortBuilder("_uid").order(direction.getSortOrder()))
+                .sort(new FieldSortBuilder("@timestamp").order(getSortOrder(direction)))
+                .sort(new FieldSortBuilder("_uid").order(getSortOrder(direction)))
         ;
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
@@ -120,6 +121,17 @@ public class ElasticSearch {
         if (hitNum == 0) {
             logger.debug("There are no results.");
             onLine.accept(null);
+        }
+    }
+
+    private SortOrder getSortOrder(Direction direction) {
+        switch (direction) {
+            case ASC:
+                return SortOrder.ASC;
+            case DESC:
+                return SortOrder.DESC;
+            default:
+                throw new RuntimeException("Unsupported direction: " + direction.toString());
         }
     }
 

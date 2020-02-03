@@ -1,13 +1,14 @@
 package org.jboss.pnc.bifrost.endpoint;
 
 import org.jboss.logging.Logger;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.dto.MetaData;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.api.bifrost.rest.Bifrost;
 import org.jboss.pnc.bifrost.common.Reference;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.common.scheduler.TimeoutExecutor;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
-import org.jboss.pnc.bifrost.source.dto.MetaData;
 import org.jboss.pnc.common.security.Md5;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @Path("/")
-public class RestImpl implements Rest {
+public class RestImpl implements Bifrost {
 
     private static Logger logger = Logger.getLogger(RestImpl.class);
 
@@ -218,16 +219,6 @@ public class RestImpl implements Rest {
             throw new ServerErrorException(e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-    }
-
-    @Override
-    public Response readinessProbe() {
-        return Response.ok().build();
-    }
-
-    @Override
-    public Response livenessProbe() {
-        return Response.ok().build(); //TODO test ES connection
     }
 
 }

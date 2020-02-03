@@ -2,8 +2,8 @@ package org.jboss.pnc.bifrost.endpoint.websocket;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.jboss.pnc.bifrost.source.dto.Direction;
-import org.jboss.pnc.bifrost.source.dto.Line;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
