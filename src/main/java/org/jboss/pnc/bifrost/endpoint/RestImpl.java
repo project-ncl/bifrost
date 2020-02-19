@@ -20,7 +20,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -122,6 +121,19 @@ public class RestImpl implements Bifrost {
             }
         };
 
+        fillQueueWithLines(matchFilters, prefixFilters, afterLine, maxLines, follow, queue, addEndOfDataMarker, subscription);
+        return Response.ok(stream).build();
+    }
+
+    protected void fillQueueWithLines(
+            String matchFilters,
+            String prefixFilters,
+            Line afterLine,
+            Integer maxLines,
+            boolean follow,
+            ArrayBlockingQueue<Optional<Line>> queue,
+            Runnable addEndOfDataMarker,
+            Subscription subscription) {
         int[] receivedLines = {0};
         Consumer<Line> onLine = line -> {
             try {
@@ -159,7 +171,6 @@ public class RestImpl implements Bifrost {
                 subscription,
                 Optional.ofNullable(maxLines)
         );
-        return Response.ok(stream).build();
     }
 
     private ScheduledThreadPoolExecutor getExecutorService() {
@@ -197,28 +208,54 @@ public class RestImpl implements Bifrost {
             Direction direction,
             Integer maxLines) throws IOException {
 
+        Md5 md5;
         try {
-            Md5 md5 = new Md5();
-            Consumer<Line> onLine = line -> {
-                try {
-                    md5.add(line.getMessage());
-                } catch (UnsupportedEncodingException e) {
-                    logger.error(e);
-                }
-            };
-            dataProvider.get(
-                    matchFilters,
-                    prefixFilters,
-                    Optional.ofNullable(afterLine),
-                    direction,
-                    Optional.ofNullable(maxLines),
-                    onLine);
-            return new MetaData(md5.digest());
+            md5 = new Md5();
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e);
             throw new ServerErrorException(e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
         }
 
+        ArrayBlockingQueue<Optional<Line>> queue = new ArrayBlockingQueue(1024); //TODO
+
+        Runnable addEndOfDataMarker = () -> {
+            try {
+                queue.offer(Optional.empty(), 5, TimeUnit.SECONDS); //TODO
+            } catch (InterruptedException e) {
+                logger.error("Cannot add end of data marker.", e);
+            }
+        };
+
+        Subscription subscription = new Subscription(addEndOfDataMarker);
+
+        fillQueueWithLines(matchFilters, prefixFilters, afterLine, maxLines, false, queue, addEndOfDataMarker, subscription);
+
+        while (true) {
+            try {
+                Optional<Line> maybeLine = queue.take();
+                if (maybeLine.isPresent()) {
+                    Line line = maybeLine.get();
+                    logger.trace("Checksumming line: " + line.asString());
+                    md5.add(line.getMessage());
+                    if (line.isLast()) {
+                        dataProvider.unsubscribe(subscription);
+                        break;
+                    }
+                } else { //empty line indicating end of results
+                    logger.info("Ending checksum, no results.");
+                    dataProvider.unsubscribe(subscription);
+                    break;
+                }
+            } catch (IOException e) {
+                logger.warn("Cannot checksum line. Unsubscribing ... " + e.getMessage());
+                dataProvider.unsubscribe(subscription);
+                break;
+            } catch (InterruptedException e) {
+                logger.error("Cannot read from queue.", e);
+                dataProvider.unsubscribe(subscription);
+                break;
+            }
+        }
+        return new MetaData(md5.digest());
     }
 
 }
