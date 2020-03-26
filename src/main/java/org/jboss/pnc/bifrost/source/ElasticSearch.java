@@ -86,6 +86,7 @@ public class ElasticSearch {
                 .size(fetchSize + 1)
                 .from(0)
                 .sort(new FieldSortBuilder("@timestamp").order(getSortOrder(direction)))
+                .sort(new FieldSortBuilder("sequence").order(getSortOrder(direction)))
                 .sort(new FieldSortBuilder("_uid").order(getSortOrder(direction)));
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
@@ -146,6 +147,7 @@ public class ElasticSearch {
         // String id = source.get("_type").toString() + "#" + source.get("_id").toString();
         String id = hit.getType() + "#" + hit.getId();
         String timestamp = getString(source, "@timestamp");
+        String sequence = getString(source, "sequence");
         String logger = getString(source, "loggerName");
         String message = getString(source, "message");
 
@@ -154,6 +156,7 @@ public class ElasticSearch {
         return Line.newBuilder()
                 .id(id)
                 .timestamp(timestamp)
+                .sequence(sequence)
                 .logger(logger)
                 .message(message)
                 .last(last)

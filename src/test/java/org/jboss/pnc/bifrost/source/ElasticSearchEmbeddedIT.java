@@ -66,6 +66,7 @@ public class ElasticSearchEmbeddedIT {
         Map<String, Object> fields = new HashMap<>();
         fields.put("id", typeKeyword);
         fields.put("@timestamp", typeDate);
+        fields.put("sequence", typeKeyword);
 
         Map<String, Object> properties = Collections.singletonMap("properties", fields);
         Map<String, Object> doc = Collections.singletonMap("doc", properties);
