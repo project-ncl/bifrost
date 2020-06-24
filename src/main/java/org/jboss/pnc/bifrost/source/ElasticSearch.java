@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +92,8 @@ public class ElasticSearch {
                 .sort(new FieldSortBuilder("_uid").order(getSortOrder(direction)));
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
-            Object[] searchAfterTimeStampId = new Object[] { Instant.parse(timestamp).toEpochMilli(),
+            TemporalAccessor accessor = DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(timestamp);
+            Object[] searchAfterTimeStampId = new Object[] { Instant.from(accessor).toEpochMilli(),
                     searchAfter.get().getSequence(), searchAfter.get().getId() };
             sourceBuilder.searchAfter(searchAfterTimeStampId);
         } else {

@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -83,12 +84,12 @@ public class RestImpl implements Bifrost {
                         complete(subscription, outputStream);
                     }
                 };
-                timeoutProbeTask.set(timeoutExecutor.submit(sendProbe, 15000, TimeUnit.MICROSECONDS));
+                timeoutProbeTask.set(timeoutExecutor.submit(sendProbe, 15000, TimeUnit.MILLISECONDS));
             }
 
             while (true) {
                 try {
-                    Optional<Line> maybeLine = queue.take();
+                    Optional<Line> maybeLine = queue.poll(30, TimeUnit.MINUTES);
                     if (maybeLine.isPresent()) {
                         Line line = maybeLine.get();
                         logger.trace("Sending line: " + line.asString());
@@ -231,54 +232,21 @@ public class RestImpl implements Bifrost {
             throw new ServerErrorException(e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-        ArrayBlockingQueue<Optional<Line>> queue = new ArrayBlockingQueue(1024); // TODO
-
-        Runnable addEndOfDataMarker = () -> {
+        Consumer<Line> onLine = line -> {
             try {
-                queue.offer(Optional.empty(), 5, TimeUnit.SECONDS); // TODO
-            } catch (InterruptedException e) {
-                logger.error("Cannot add end of data marker.", e);
+                md5.add(line.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                throw new ServerErrorException(e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
             }
         };
-
-        Subscription subscription = new Subscription(addEndOfDataMarker);
-
-        fillQueueWithLines(
+        dataProvider.get(
                 matchFilters,
                 prefixFilters,
-                afterLine,
-                maxLines,
-                false,
-                queue,
-                addEndOfDataMarker,
-                subscription);
+                Optional.ofNullable(afterLine),
+                direction,
+                Optional.ofNullable(maxLines),
+                onLine);
 
-        while (true) {
-            try {
-                Optional<Line> maybeLine = queue.take();
-                if (maybeLine.isPresent()) {
-                    Line line = maybeLine.get();
-                    logger.trace("Checksumming line: " + line.asString());
-                    md5.add(line.getMessage());
-                    if (line.isLast()) {
-                        dataProvider.unsubscribe(subscription);
-                        break;
-                    }
-                } else { // empty line indicating end of results
-                    logger.info("Ending checksum, no results.");
-                    dataProvider.unsubscribe(subscription);
-                    break;
-                }
-            } catch (IOException e) {
-                logger.warn("Cannot checksum line. Unsubscribing ... " + e.getMessage());
-                dataProvider.unsubscribe(subscription);
-                break;
-            } catch (InterruptedException e) {
-                logger.error("Cannot read from queue.", e);
-                dataProvider.unsubscribe(subscription);
-                break;
-            }
-        }
         return new MetaData(md5.digest());
     }
 }

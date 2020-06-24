@@ -51,7 +51,7 @@ public class MethodGetLines extends MethodBase implements Method<GetLinesDto> {
                         in.getDirection(),
                         Optional.ofNullable(in.getMaxLines()),
                         onLine);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("Unable to get data from Elasticsearch.", e);
             }
         });
