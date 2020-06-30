@@ -34,4 +34,33 @@ public class Strings {
         }
         return map;
     }
+
+    /**
+     * If the value is not empty the value is returned otherwise the defaultValue is returned.
+     *
+     * @param value
+     * @param defaultValue
+     * @return
+     */
+    public static String valueOrDefault(String value, String defaultValue) {
+        if (!isEmpty(value)) {
+            return value;
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Check if the given string is null or contains only whitespace characters.
+     *
+     * @param string String to check for non-whitespace characters
+     * @return boolean True if the string is null, empty, or contains only whitespace (empty when trimmed). Otherwise
+     *         return false.
+     */
+    public static boolean isEmpty(String string) {
+        if (string == null) {
+            return true;
+        }
+        return string.trim().isEmpty();
+    }
 }

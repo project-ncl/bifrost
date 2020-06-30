@@ -14,6 +14,7 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.bifrost.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,8 +94,9 @@ public class ElasticSearch {
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
             TemporalAccessor accessor = DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(timestamp);
+            // search after must contain the same fields as sort
             Object[] searchAfterTimeStampId = new Object[] { Instant.from(accessor).toEpochMilli(),
-                    searchAfter.get().getSequence(), searchAfter.get().getId() };
+                    Strings.valueOrDefault(searchAfter.get().getSequence(), "0"), searchAfter.get().getId() };
             sourceBuilder.searchAfter(searchAfterTimeStampId);
         } else {
             // TODO tailFromNow vs tailFromBeginning
