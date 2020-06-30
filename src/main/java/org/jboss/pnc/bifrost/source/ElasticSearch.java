@@ -103,7 +103,7 @@ public class ElasticSearch {
             // queryBuilder.must(timestampRange);
         }
 
-        logger.debug("Search query: " + queryBuilder);
+        logger.debug("Search query: " + sourceBuilder);
 
         SearchRequest searchRequest = new SearchRequest(indexes);
         searchRequest.source(sourceBuilder);
