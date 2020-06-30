@@ -1,9 +1,11 @@
 package org.jboss.pnc.bifrost.endpoint.provider;
 
+import io.quarkus.arc.DefaultBean;
 import org.jboss.logging.Logger;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.Config;
+import org.jboss.pnc.bifrost.common.MainBean;
 import org.jboss.pnc.bifrost.common.Reference;
 import org.jboss.pnc.bifrost.common.Strings;
 import org.jboss.pnc.bifrost.common.scheduler.BackOffRunnableConfig;
@@ -22,6 +24,7 @@ import java.util.function.Consumer;
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
+// @MainBean
 @ApplicationScoped
 public class DataProvider {
 
@@ -141,7 +144,7 @@ public class DataProvider {
                     Strings.toMap(matchFilters),
                     Strings.toMap(prefixFilters),
                     Optional.ofNullable(lastLine.get()),
-                    Direction.ASC,
+                    direction,
                     fetchSize,
                     onLineInternal);
         } while (lastLine.get() != null && !lastLine.get().isLast());

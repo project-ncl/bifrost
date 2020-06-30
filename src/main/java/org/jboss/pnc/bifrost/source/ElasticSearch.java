@@ -96,7 +96,7 @@ public class ElasticSearch {
             TemporalAccessor accessor = DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(timestamp);
             // search after must contain the same fields as sort
             Object[] searchAfterTimeStampId = new Object[] { Instant.from(accessor).toEpochMilli(),
-                    Strings.valueOrDefault(searchAfter.get().getSequence(), "0"), searchAfter.get().getId() };
+                    getSequence(searchAfter.get().getSequence(), direction), searchAfter.get().getId() };
             sourceBuilder.searchAfter(searchAfterTimeStampId);
         } else {
             // TODO tailFromNow vs tailFromBeginning
@@ -132,6 +132,11 @@ public class ElasticSearch {
             logger.debug("There are no results.");
             onLine.accept(null);
         }
+    }
+
+    protected String getSequence(String sequence, Direction direction) {
+        Long defaultSequenceValue = direction == Direction.ASC ? Long.MAX_VALUE : Long.MIN_VALUE;
+        return Strings.valueOrDefault(sequence, Long.toString(defaultSequenceValue));
     }
 
     private SortOrder getSortOrder(Direction direction) {

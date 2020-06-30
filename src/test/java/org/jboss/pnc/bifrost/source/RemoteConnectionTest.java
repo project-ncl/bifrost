@@ -1,5 +1,6 @@
 package org.jboss.pnc.bifrost.source;
 
+import io.quarkus.arc.DefaultBean;
 import io.quarkus.test.junit.QuarkusTest;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.BasicHttpEntity;
@@ -7,6 +8,7 @@ import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.bifrost.common.MainBean;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.jboss.pnc.bifrost.test.DebugTest;
 import org.junit.jupiter.api.Assertions;
@@ -38,8 +40,7 @@ public class RemoteConnectionTest {
     ElasticSearchConfig elasticSearchConfig;
 
     @Inject
-    @Default
-    // do not use the alternative
+    // @MainBean // do not use the mock alternative, add qualifier to the DataProvider
     DataProvider dataProvider;
 
     @Test
@@ -64,7 +65,7 @@ public class RemoteConnectionTest {
             assert inserted;
         };
         // dataProvider.get("", "", Optional.empty(), Direction.DESC, Optional.of(10), onLine);
-        Line after = Line.newBuilder().id("123").timestamp("2020-06-26T18:47:29.036Z").build();
+        Line after = Line.newBuilder().id("log#AXMG530ewm5cr6w_UJtL").timestamp("2020-06-30T20:24:37.197Z").build();
         dataProvider.get("", "", Optional.of(after), Direction.DESC, Optional.of(15), onLine);
 
         List<Line> received = new ArrayList<>();

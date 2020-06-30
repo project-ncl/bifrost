@@ -1,5 +1,6 @@
 package org.jboss.pnc.bifrost.endpoint.provider;
 
+import io.quarkus.test.Mock;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.mock.LineProducer;
@@ -17,8 +18,7 @@ import java.util.function.Consumer;
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-@Alternative()
-@Priority(1)
+@Mock
 @ApplicationScoped
 public class DataProviderMock extends DataProvider {
 
