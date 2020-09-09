@@ -162,6 +162,7 @@ public class ElasticSearch {
         String sequence = getString(source, "sequence");
         String logger = getString(source, "loggerName");
         String message = getString(source, "message");
+        String stackTrace = getString(source, "stackTrace");
 
         Map<String, String> mdc = (Map<String, String>) source.get("mdc");
 
@@ -173,6 +174,7 @@ public class ElasticSearch {
                 .message(message)
                 .last(last)
                 .mdc(mdc)
+                .stackTrace(stackTrace)
                 .build();
     }
 
