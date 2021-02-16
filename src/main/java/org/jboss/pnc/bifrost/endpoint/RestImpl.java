@@ -16,6 +16,7 @@ import org.jboss.pnc.common.security.Md5;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.validation.ValidationException;
 import javax.ws.rs.Path;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
@@ -27,6 +28,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +56,10 @@ public class RestImpl implements Bifrost {
 
     private Map<String, ScheduledThreadPoolExecutor> probeExecutor = new ConcurrentHashMap<>();
 
+    // accepts 2020-06-04T18:16:02.027+0000
+    private static final DateTimeFormatter fallbackDateTimeFormatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
+
     @Inject
     MeterRegistry registry;
 
@@ -74,6 +82,8 @@ public class RestImpl implements Bifrost {
             Integer maxLines,
             boolean follow,
             String timeoutProbeString) {
+
+        validateAndFixInputDate(afterLine);
 
         ArrayBlockingQueue<Optional<Line>> queue = new ArrayBlockingQueue(1024); // TODO
 
@@ -231,6 +241,8 @@ public class RestImpl implements Bifrost {
             Line afterLine,
             Direction direction,
             Integer maxLines) throws IOException {
+        validateAndFixInputDate(afterLine);
+
         List<Line> lines = new ArrayList<>();
         Consumer<Line> onLine = line -> lines.add(line);
         dataProvider.get(
@@ -250,6 +262,8 @@ public class RestImpl implements Bifrost {
             Line afterLine,
             Direction direction,
             Integer maxLines) throws IOException {
+
+        validateAndFixInputDate(afterLine);
 
         Md5 md5;
         try {
@@ -276,5 +290,29 @@ public class RestImpl implements Bifrost {
                 onLine);
 
         return new MetaData(md5.digest());
+    }
+
+    /**
+     * Validate and try to fix date format
+     */
+    private void validateAndFixInputDate(Line afterLine) {
+        if (afterLine != null) {
+            String timestamp = afterLine.getTimestamp();
+            try {
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(timestamp);
+            } catch (DateTimeParseException e) {
+                try {
+                    logger.warn(
+                            "Received unexpected date format " + timestamp
+                                    + ", converting to ISO_OFFSET_DATE_TIME ...");
+                    warnCounter.increment();
+                    TemporalAccessor parsed = fallbackDateTimeFormatter.parse(timestamp);
+                    afterLine.setTimestamp(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(parsed));
+                } catch (DateTimeParseException e1) {
+                    errCounter.increment();
+                    throw new ValidationException("Invalid date-time format, expected ISO_OFFSET_DATE_TIME.", e1);
+                }
+            }
+        }
     }
 }

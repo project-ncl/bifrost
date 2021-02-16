@@ -112,7 +112,7 @@ public class ElasticSearch {
                 .sort(new FieldSortBuilder("_uid").order(getSortOrder(direction)));
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
-            TemporalAccessor accessor = DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(timestamp);
+            TemporalAccessor accessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(timestamp);
             // search after must contain the same fields as sort
             Object[] searchAfterTimeStampId = new Object[] {
                     Instant.from(accessor).toEpochMilli(),
