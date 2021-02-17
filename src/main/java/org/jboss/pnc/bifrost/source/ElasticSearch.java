@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.jboss.pnc.bifrost.common.DateUtil.validateAndFixInputDate;
+
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
@@ -178,7 +180,7 @@ public class ElasticSearch {
 
         // String id = source.get("_type").toString() + "#" + source.get("_id").toString();
         String id = hit.getType() + "#" + hit.getId();
-        String timestamp = getString(source, "@timestamp");
+        String timestamp = validateAndFixInputDate(getString(source, "@timestamp"));
         String sequence = getString(source, "sequence");
         String logger = getString(source, "loggerName");
         String message = getString(source, "message");
