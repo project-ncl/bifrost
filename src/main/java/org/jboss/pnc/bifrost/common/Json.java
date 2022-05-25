@@ -15,29 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost;
+package org.jboss.pnc.bifrost.common;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import javax.enterprise.context.ApplicationScoped;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-@Getter
-@Setter
-@ApplicationScoped
-public class Config {
+public class Json {
 
-    @ConfigProperty(name = "bifrost.sourceClass")
-    String sourceClass;
+    private static final ObjectMapper mapper;
 
-    @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "100")
-    int defaultSourceFetchSize;
+    static {
+        mapper = new ObjectMapper();
+    }
 
-    @ConfigProperty(name = "bifrost.sourcePollThreads", defaultValue = "4")
-    int sourcePollThreads;
-
+    public static ObjectMapper mapper() {
+        return mapper;
+    }
 }

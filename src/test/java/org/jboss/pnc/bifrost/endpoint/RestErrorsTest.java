@@ -20,6 +20,7 @@ package org.jboss.pnc.bifrost.endpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.api.bifrost.rest.Bifrost;
+import org.jboss.pnc.bifrost.common.Json;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProviderMock;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.jupiter.api.Assertions;
@@ -28,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -74,9 +73,8 @@ public class RestErrorsTest {
         try {
             rest.getLines("", "", null, Direction.ASC, 10);
         } catch (WebApplicationException e) {
-            Jsonb jsonb = JsonbBuilder.create();
             ByteArrayInputStream entityStream = (ByteArrayInputStream) e.getResponse().getEntity();
-            receivedExceptionMessage = jsonb.fromJson(entityStream, String.class);
+            receivedExceptionMessage = Json.mapper().readValue(entityStream, String.class);
         }
         dataProvider.removeThrowOnCall();
         Assertions.assertEquals(exceptionMessage, receivedExceptionMessage);

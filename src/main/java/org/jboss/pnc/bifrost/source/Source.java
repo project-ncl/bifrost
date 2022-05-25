@@ -15,29 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost.common;
+package org.jboss.pnc.bifrost.source;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import io.micrometer.core.annotation.Timed;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
-/**
- * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
- */
-public class StringTest {
+public interface Source {
 
-    @Test
-    public void shouldDeserializeQuery() {
-        String query = "key1:value1|value2,key2:value22";
-        Map<String, List<String>> map = Strings.toMap(query);
+    void close();
 
-        Assertions.assertEquals(map.get("key1").size(), 2);
-        Assertions.assertLinesMatch(map.get("key1"), Arrays.asList(new String[] { "value1", "value2" }));
-
-        Assertions.assertLinesMatch(map.get("key2"), Arrays.asList(new String[] { "value22" }));
-
-    }
+    @Timed
+    void get(
+            Map<String, List<String>> matchFilters,
+            Map<String, List<String>> prefixFilters,
+            Optional<Line> searchAfter,
+            Direction direction,
+            int fetchSize,
+            Consumer<Line> onLine) throws IOException;
 }

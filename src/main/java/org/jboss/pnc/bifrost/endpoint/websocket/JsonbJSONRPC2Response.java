@@ -17,17 +17,18 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
+import org.jboss.logging.Logger;
+import org.jboss.pnc.bifrost.common.Json;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
 public class JsonbJSONRPC2Response extends JSONRPC2Response {
 
-    private Jsonb jsonb = JsonbBuilder.create();
+    private Logger logger = Logger.getLogger(JsonbJSONRPC2Response.class);
 
     public JsonbJSONRPC2Response(Object result, Object id) {
         super(result, id);
@@ -41,10 +42,6 @@ public class JsonbJSONRPC2Response extends JSONRPC2Response {
         super(error, id);
     }
 
-    protected Jsonb getJsonb() {
-        return jsonb;
-    }
-
     @Override
     public String toJSONString() {
         Map<String, Object> out = new HashMap<>();
@@ -55,6 +52,12 @@ public class JsonbJSONRPC2Response extends JSONRPC2Response {
         }
         out.put("id", getID());
         out.put("jsonrpc", "2.0");
-        return getJsonb().toJson(out);
+        try {
+            return Json.mapper().writeValueAsString(out);
+        } catch (JsonProcessingException e) {
+            String message = "Cannot serialize response.";
+            logger.error(message, e);
+            return "{'error':'" + message + "'}";
+        }
     }
 }

@@ -1,0 +1,78 @@
+#
+# JBoss, Home of Professional Open Source.
+# Copyright 2020-2022 Red Hat, Inc., and individual contributors
+# as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+quarkus:
+  log:
+    category:
+      org.jboss.pnc:
+        level: TRACE
+      org.elasticsearch:
+        level: INFO
+      org.apache.http:
+        level: INFO
+    console:
+      level: TRACE
+      format: '%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n'
+      enable: 'true'
+    level: INFO
+  index-dependency:
+    elasticsearch:
+      artifact-id: elasticsearch
+      group-id: org.elasticsearch
+  http:
+    host: localhost
+    port: 8081
+  micrometer:
+    export:
+      json:
+        enabled: true
+  datasource:
+    db-kind: ${QUARKUS_DATASOURCE:postgresql}
+    jdbc.url: ${QUARKUS_DATASOURCE_URL:}
+    username: ${QUARKUS_DATASOURCE_USERNAME:}
+    password: ${QUARKUS_DATASOURCE_PASSWORD:}
+elasticsearch:
+  hosts: https://host:443
+  indexes: test-*
+  #keyStorePath =
+  #keyStorePass =
+  #keyPass =
+bifrost:
+  backoffrunnable:
+    delayMillis: 1000
+    maxBackOffCycles: 10
+    pollIntervalMillis: 250
+    timeOutMillis: 300000
+  defaultSourceFetchSize: 100
+  sourcePollThreads: 4
+'%test':
+  quarkus:
+    datasource:
+      jdbc:
+        url: jdbc:h2:tcp://localhost/mem:test
+      db-kind: h2
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+  bifrost:
+    sourceClass: org.jboss.pnc.bifrost.source.db.DatabaseSource
+  kafka2db:
+    accept-filters:
+      - logger-name-prefix: org.jboss.pnc
+        level: INFO
+    hostname: localhost-0

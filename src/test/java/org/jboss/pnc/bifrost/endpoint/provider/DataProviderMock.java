@@ -40,9 +40,6 @@ public class DataProviderMock extends DataProvider {
     Deque<Line> lines = new LinkedList<>();
     Optional<IOException> throwOnCall = Optional.empty();
 
-    // @Inject
-    // Subscriptions subscriptions;
-
     public DataProviderMock() {
         super();
     }
