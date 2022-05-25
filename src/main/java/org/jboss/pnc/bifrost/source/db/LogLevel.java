@@ -15,24 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost.endpoint.configuration;
+package org.jboss.pnc.bifrost.source.db;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Destroyed;
-import javax.enterprise.context.Initialized;
-import javax.enterprise.event.Observes;
+public enum LogLevel {
 
-/**
- * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
- */
-public class BootListener {
+    TRACE(0), DEBUG(1), INFO(2), WARN(3), ERROR(4), FATAL(5);
 
-    public void init(@Observes @Initialized(ApplicationScoped.class) Object o) {
+    private final int intLevel;
 
+    LogLevel(int intLevel) {
+        this.intLevel = intLevel;
     }
 
-    public void destroy(@Observes @Destroyed(ApplicationScoped.class) Object o) {
-
+    public int intLevel() {
+        return intLevel;
     }
-
 }

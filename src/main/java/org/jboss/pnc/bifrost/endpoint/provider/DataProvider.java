@@ -24,13 +24,13 @@ import org.jboss.logging.Logger;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.Config;
+import org.jboss.pnc.bifrost.common.Produced;
 import org.jboss.pnc.bifrost.common.Reference;
-import org.jboss.pnc.bifrost.common.Strings;
 import org.jboss.pnc.bifrost.common.scheduler.BackOffRunnableConfig;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
-import org.jboss.pnc.bifrost.source.ElasticSearch;
-import org.jboss.pnc.bifrost.source.ElasticSearchConfig;
+import org.jboss.pnc.bifrost.source.Source;
+import org.jboss.pnc.common.Strings;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -57,12 +57,11 @@ public class DataProvider {
     Config config;
 
     @Inject
-    ElasticSearchConfig elasticSearchConfig;
-
-    @Inject
     Subscriptions subscriptions;
 
-    ElasticSearch elasticSearch;
+    @Produced
+    @Inject
+    Source source;
 
     @Inject
     MeterRegistry registry;
@@ -75,7 +74,6 @@ public class DataProvider {
 
     @PostConstruct
     public void init() {
-        elasticSearch = new ElasticSearch(elasticSearchConfig);
         initMetrics();
     }
 
@@ -125,13 +123,20 @@ public class DataProvider {
         subscriptions.subscribe(subscription, searchTask, afterLine, onLine, backOffRunnableConfig);
     }
 
+    /**
+     * Example filters:
+     *
+     * "prefixFilters": loggerName.keyword: org.jboss.pnc.causeway|org.jboss.pnc._userlog_,
+     * level.keyword:INFO|ERROR|WARN, "matchFilters": mdc.buildId.keyword:ARTPKTKTQGAAC,
+     * mdc.processContext.keyword:317211334116737024
+     */
     protected void readFromSource(
             String matchFilters,
             String prefixFilters,
             int fetchSize,
             Optional<Line> lastResult,
             Consumer<Line> onLine) throws IOException {
-        elasticSearch.get(
+        source.get(
                 Strings.toMap(matchFilters),
                 Strings.toMap(prefixFilters),
                 lastResult,
@@ -173,7 +178,7 @@ public class DataProvider {
             if (fetchSize < 1) {
                 break;
             }
-            elasticSearch.get(
+            source.get(
                     Strings.toMap(matchFilters),
                     Strings.toMap(prefixFilters),
                     Optional.ofNullable(lastLine.get()),

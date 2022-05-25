@@ -25,6 +25,8 @@ import org.elasticsearch.client.RestClient;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
+import org.jboss.pnc.bifrost.source.elasticsearch.ClientFactory;
+import org.jboss.pnc.bifrost.source.elasticsearch.ElasticSearchConfig;
 import org.jboss.pnc.bifrost.test.DebugTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

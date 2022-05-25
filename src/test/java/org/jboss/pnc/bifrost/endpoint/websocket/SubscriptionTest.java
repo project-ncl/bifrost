@@ -17,12 +17,14 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.logging.Logger;
 import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.bifrost.common.Json;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProviderMock;
 import org.jboss.pnc.bifrost.mock.LineProducer;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
 import javax.inject.Inject;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.OnMessage;
@@ -195,9 +195,13 @@ public class SubscriptionTest {
         @OnMessage
         void message(String message, Session session) {
             logger.debug("Client received: " + message);
-            Jsonb jsonb = JsonbBuilder.create();
 
-            Map<String, Object> rpcResponse = jsonb.fromJson(message, Map.class);
+            Map<String, Object> rpcResponse;
+            try {
+                rpcResponse = Json.mapper().readValue(message, Map.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Unable to populate line bean.", e);
+            }
             Map<String, Object> resultMap = (Map<String, Object>) rpcResponse.get("result");
 
             String type = (String) resultMap.get("type");
@@ -213,7 +217,6 @@ public class SubscriptionTest {
                     BeanUtils.populate(line, (Map<String, ? extends Object>) resultMap.get("value"));
                 } catch (Exception e) {
                     logger.error("Unable to populate line bean.", e);
-                    e.printStackTrace();
                 }
                 LINES.add(line);
             }
@@ -229,9 +232,8 @@ public class SubscriptionTest {
         }
     }
 
-    private static List<Line> parseLines(String json) {
-        Jsonb jsonb = JsonbBuilder.create();
-        Line[] lines = jsonb.fromJson(json, Line[].class);
+    private static List<Line> parseLines(String json) throws JsonProcessingException {
+        Line[] lines = Json.mapper().readValue(json, Line[].class);
         return Arrays.asList(lines);
     }
 }

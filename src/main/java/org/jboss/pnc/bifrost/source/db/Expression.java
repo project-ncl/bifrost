@@ -15,29 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import javax.enterprise.context.ApplicationScoped;
+package org.jboss.pnc.bifrost.source.db;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-@Getter
-@Setter
-@ApplicationScoped
-public class Config {
-
-    @ConfigProperty(name = "bifrost.sourceClass")
-    String sourceClass;
-
-    @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "100")
-    int defaultSourceFetchSize;
-
-    @ConfigProperty(name = "bifrost.sourcePollThreads", defaultValue = "4")
-    int sourcePollThreads;
-
+public class Expression {
 }

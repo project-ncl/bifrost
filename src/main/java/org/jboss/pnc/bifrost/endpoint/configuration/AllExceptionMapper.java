@@ -17,11 +17,12 @@
  */
 package org.jboss.pnc.bifrost.endpoint.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -33,15 +34,25 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 public class AllExceptionMapper implements ExceptionMapper<Exception> {
     private static final Logger log = LoggerFactory.getLogger(AllExceptionMapper.class);
 
-    private Jsonb jsonb = JsonbBuilder.create();
+    @Inject
+    ObjectMapper mapper;
 
     @Override
     public Response toResponse(Exception e) {
         log.error("An exception occurred.", e);
 
-        return Response.status(INTERNAL_SERVER_ERROR)
-                .entity(jsonb.toJson(e.getMessage()))
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+        try {
+            return Response.status(INTERNAL_SERVER_ERROR)
+                    .entity(mapper.writeValueAsString(e.getMessage()))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (JsonProcessingException ex) {
+            String message = "Cannot serialize exception message.";
+            log.error(message, e);
+            return Response.status(INTERNAL_SERVER_ERROR)
+                    .entity("{'" + message + "'}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
     }
 }

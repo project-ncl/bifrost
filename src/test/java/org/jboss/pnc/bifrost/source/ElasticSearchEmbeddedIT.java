@@ -30,15 +30,16 @@ import org.elasticsearch.rest.RestStatus;
 import org.jboss.logging.Logger;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.bifrost.common.Json;
 import org.jboss.pnc.bifrost.mock.LineProducer;
+import org.jboss.pnc.bifrost.source.elasticsearch.ClientFactory;
+import org.jboss.pnc.bifrost.source.elasticsearch.ElasticSearch;
+import org.jboss.pnc.bifrost.source.elasticsearch.ElasticSearchConfig;
 import org.jboss.pnc.bifrost.test.Wait;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ import java.util.function.Consumer;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @QuarkusTest
-// although no need to boot the applicaiton, the logging does not work without this annota
+// although no need to boot the application, the logging does not work without this annotation
 public class ElasticSearchEmbeddedIT {
 
     private static Logger logger = Logger.getLogger(ElasticSearchEmbeddedIT.class);
@@ -72,9 +73,6 @@ public class ElasticSearchEmbeddedIT {
 
     @BeforeAll
     public static void init() throws Exception {
-        JsonbConfig config = new JsonbConfig().withFormatting(true);
-        Jsonb jsonb = JsonbBuilder.create(config);
-
         RestClient lowLevelRestClient = clientFactory.getConnectedClient();
 
         Map<String, String> typeKeyword = Collections.singletonMap("type", "keyword");
@@ -89,7 +87,7 @@ public class ElasticSearchEmbeddedIT {
         Map<String, Object> doc = Collections.singletonMap("doc", properties);
         Map<String, Object> mappings = Collections.singletonMap("mappings", doc);
 
-        String jsonString = jsonb.toJson(mappings);
+        String jsonString = Json.mapper().writeValueAsString(mappings);
 
         logger.info("Json create index: " + jsonString);
 
@@ -100,12 +98,10 @@ public class ElasticSearchEmbeddedIT {
 
     @Test
     public void shouldInsertAndReadData() throws Exception {
-        JsonbConfig config = new JsonbConfig().withFormatting(true);
-        Jsonb jsonb = JsonbBuilder.create(config);
 
         Line insertLine = LineProducer.getLine(1, true, "fddgfh");
 
-        byte[] jsonLine = jsonb.toJson(insertLine).getBytes();
+        byte[] jsonLine = Json.mapper().writeValueAsBytes(insertLine);
         logger.info("json line: " + new String(jsonLine));
 
         RestClient restClient = clientFactory.getConnectedClient();
@@ -141,7 +137,7 @@ public class ElasticSearchEmbeddedIT {
         insertLine(2, "build-1", defaultLogger);
         insertLine(5, "build-2", defaultLogger);
         insertLine(5, "build-2", defaultLogger + ".build-log");
-        insertLine(4, "build 2", defaultLogger); // note the logger name
+        insertLine(4, "build 2", defaultLogger); // note the ctx
         Thread.sleep(1000);
 
         ElasticSearch elasticSearch = new ElasticSearch(elasticSearchConfig);
@@ -169,72 +165,10 @@ public class ElasticSearchEmbeddedIT {
         elasticSearch.close();
     }
 
-    // @Test
-    // public void shouldGetLinesAfter() throws Exception {
-    // insertLine(5, "should");
-    // Thread.sleep(100);
-    // insertLine(5, "should");
-    // Thread.sleep(1000);
-    //
-    // ElasticSearch elasticSearch = new ElasticSearch(elasticSearchConfig);
-    // ResultProcessor source = new ResultProcessor(elasticSearch);
-    //
-    // List<Line> lines = source.get("ctx:should", "logger:" + defaultLogger, Optional.empty(), Direction.ASC, 5);
-    //
-    // Assertions.assertEquals(5, lines.size());
-    // lines.forEach(System.out::println);
-    //
-    //
-    // Line afterLine = lines.get(4);
-    // List<Line> newLines = source.get("ctx:should", "logger:" + defaultLogger, Optional.of(afterLine), Direction.ASC,
-    // 5);
-    //
-    // Assertions.assertEquals(5, newLines.size());
-    // Assertions.assertTrue(
-    // Long.parseLong(lines.get(4).getTimestamp()) < Long.parseLong(newLines.get(0).getTimestamp())
-    // );
-    // newLines.forEach(System.out::println);
-    // elasticSearch.close();
-    // }
-
-    // @Test
-    // public void shouldGetAllLines() throws Exception {
-    // insertLine(20, "all");
-    // Thread.sleep(1000);
-    //
-    // ElasticSearch elasticSearch = new ElasticSearch(elasticSearchConfig);
-    // ResultProcessor source = new ResultProcessor(elasticSearch);
-    //
-    // // List<Line> lines = new ArrayList<>();
-    // // Consumer<Line> onLine = line -> {
-    // // lines.add(line);
-    // // };
-    // List<Line> lines = source.get(
-    // "ctx=all",
-    // "logger=" + defaultLogger,
-    // Optional.empty(),
-    // Direction.ASC,
-    // 4);
-    //
-    // // Wait.forCondition(()->lines.size() == 20, 3, ChronoUnit.SECONDS);
-    //
-    // Assertions.assertEquals(20, lines.size());
-    // lines.forEach(System.out::println);
-    // elasticSearch.close();
-    // }
-
-    // @Test
-    // public void shouldSubscribeToNewLines() throws JsonProcessingException, InterruptedException, TimeoutException {
-    // //TODO test shouldSubscribeToNewLines
-    // }
-
     private void insertLine(Integer numberOfLines, String ctx, String loggerName) throws Exception {
-        JsonbConfig config = new JsonbConfig().withFormatting(true);
-        Jsonb jsonb = JsonbBuilder.create(config);
-
         List<Line> lines = LineProducer.getLines(numberOfLines, ctx, loggerName);
         for (Line line : lines) {
-            byte[] jsonLine = jsonb.toJson(line).getBytes();
+            byte[] jsonLine = Json.mapper().writeValueAsBytes(line);
             RestClient restClient = clientFactory.getConnectedClient();
             RestHighLevelClient client = new RestHighLevelClient(restClient);
             IndexRequest indexRequest = new IndexRequest("test", "doc");

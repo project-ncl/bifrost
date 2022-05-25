@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2020-2022 Red Hat, Inc., and individual contributors
+ * Copyright 2022 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+package org.jboss.pnc.bifrost.kafkaconsumer;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-@Getter
-@Setter
 @ApplicationScoped
-public class Config {
+public class StoredCounter {
 
-    @ConfigProperty(name = "bifrost.sourceClass")
-    String sourceClass;
+    private Long count = 0L;
 
-    @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "100")
-    int defaultSourceFetchSize;
+    /**
+     * Called on each increment with the incremented count value.
+     */
+    private List<Consumer<Long>> incrementListeners = new ArrayList<>();
 
-    @ConfigProperty(name = "bifrost.sourcePollThreads", defaultValue = "4")
-    int sourcePollThreads;
+    public void addIncrementListener(Consumer<Long> onIncrement) {
+        incrementListeners.add(onIncrement);
+    }
+
+    public void removeIncrementListener(Consumer<Long> onIncrement) {
+        incrementListeners.remove(onIncrement);
+    }
+
+    public void increment() {
+        count++;
+        incrementListeners.forEach(onIncrement -> onIncrement.accept(count));
+    }
 
 }

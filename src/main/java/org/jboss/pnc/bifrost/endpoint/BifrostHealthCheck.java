@@ -17,12 +17,17 @@
  */
 package org.jboss.pnc.bifrost.endpoint;
 
+import io.smallrye.reactive.messaging.health.HealthReport;
+import io.smallrye.reactive.messaging.kafka.KafkaConnector;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 import org.eclipse.microprofile.health.Liveness;
 import org.eclipse.microprofile.health.Readiness;
+import org.eclipse.microprofile.reactive.messaging.spi.Connector;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -32,8 +37,19 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class BifrostHealthCheck implements HealthCheck {
 
+    @Inject
+    @Connector(value = "smallrye-kafka")
+    KafkaConnector kafkaConnector;
+
     @Override
     public HealthCheckResponse call() {
-        return HealthCheckResponse.up("Server is running.");
+        HealthCheckResponseBuilder responseBuilder = HealthCheckResponse.named("Bifrost health check");
+        HealthReport healthReport = kafkaConnector.getLiveness();
+        if (healthReport.isOk()) {
+            responseBuilder.up();
+        } else {
+            responseBuilder.down();
+        }
+        return responseBuilder.build();
     }
 }

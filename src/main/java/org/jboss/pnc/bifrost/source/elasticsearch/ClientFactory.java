@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost.source;
+package org.jboss.pnc.bifrost.source.elasticsearch;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;

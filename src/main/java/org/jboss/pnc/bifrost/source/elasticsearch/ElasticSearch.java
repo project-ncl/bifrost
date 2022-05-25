@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost.source;
+package org.jboss.pnc.bifrost.source.elasticsearch;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;
@@ -34,11 +34,12 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
-import org.jboss.pnc.bifrost.common.Strings;
+import org.jboss.pnc.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.Instant;
@@ -55,10 +56,10 @@ import static org.jboss.pnc.bifrost.common.DateUtil.validateAndFixInputDate;
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-public class ElasticSearch {
+@Dependent
+public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
 
     private static final String className = ElasticSearch.class.getName();
-
     private final Logger logger = LoggerFactory.getLogger(ElasticSearch.class);
 
     private RestClient lowLevelRestClient;
@@ -78,12 +79,13 @@ public class ElasticSearch {
         errCounter = registry.counter(className + ".error.count");
     }
 
+    @Inject
     public ElasticSearch(ElasticSearchConfig elasticSearchConfig) {
         this.elasticSearchConfig = elasticSearchConfig;
         init();
     }
 
-    public void init() {
+    private void init() {
         try {
             lowLevelRestClient = new ClientFactory(elasticSearchConfig).getConnectedClient();
         } catch (Exception e) {
@@ -93,6 +95,7 @@ public class ElasticSearch {
         client = new RestHighLevelClient(lowLevelRestClient);
     }
 
+    @Override
     public void close() {
         try {
             lowLevelRestClient.close();
@@ -106,6 +109,7 @@ public class ElasticSearch {
      * Queries the source and call onLine in the same thread when a new line is received. Method returns when all the
      * lines are fetched.
      */
+    @Override
     @Timed
     public void get(
             Map<String, List<String>> matchFilters,

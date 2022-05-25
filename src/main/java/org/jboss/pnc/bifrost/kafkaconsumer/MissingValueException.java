@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2020-2022 Red Hat, Inc., and individual contributors
+ * Copyright 2022 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.pnc.bifrost.source;
+package org.jboss.pnc.bifrost.kafkaconsumer;
+
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-public class ClientConnectionException extends Exception {
-
-    public ClientConnectionException(String message, Exception e) {
-        super(message, e);
+public class MissingValueException extends IOException {
+    public MissingValueException(String message) {
+        super(message);
     }
 }
