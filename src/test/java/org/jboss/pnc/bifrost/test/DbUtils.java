@@ -17,13 +17,16 @@
  */
 package org.jboss.pnc.bifrost.test;
 
+import org.jboss.pnc.bifrost.source.db.LogEntry;
+import org.jboss.pnc.bifrost.source.db.LogEntryLocalRepository;
 import org.jboss.pnc.bifrost.source.db.LogLevel;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.common.concurrent.Sequence;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 /**
@@ -32,26 +35,27 @@ import java.util.Optional;
 @Dependent
 public class DbUtils {
 
-    public void insertLine(Integer numberOfLines, long ctx, String loggerName) throws Exception {
-        insertLine(numberOfLines, ctx, loggerName, null);
+    @Inject
+    LogEntryLocalRepository logEntryRepository;
+
+    public void insertLines(Integer numberOfLines, long ctx, String loggerName) throws Exception {
+        insertLines(numberOfLines, ctx, loggerName, null);
     }
 
     @Transactional
-    public void insertLine(Integer numberOfLines, long ctx, String loggerName, Instant timestamp) throws Exception {
+    public void insertLines(Integer numberOfLines, long ctx, String loggerName, OffsetDateTime timestamp)
+            throws Exception {
+        LogEntry logEntry = new LogEntry(Sequence.nextId(), ctx, "0", "abc123", false, 1L);
         for (int id = 0; id < numberOfLines; id++) {
-            LogRecord logRecord = new LogRecord(
+            LogLine logLine = new LogLine(
                     Sequence.nextId(),
-                    Optional.ofNullable(timestamp).orElse(Instant.now()),
+                    logEntryRepository.get(logEntry),
+                    Optional.ofNullable(timestamp).orElse(OffsetDateTime.now()),
                     id,
                     LogLevel.INFO,
                     loggerName,
-                    "My message " + id,
-                    ctx,
-                    0L,
-                    "abc123",
-                    false,
-                    1L);
-            logRecord.persist();
+                    "My message " + id);
+            logLine.persist();
         }
     }
 

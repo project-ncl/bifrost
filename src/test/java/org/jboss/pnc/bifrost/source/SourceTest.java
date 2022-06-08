@@ -23,18 +23,13 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.common.Produced;
-import org.jboss.pnc.bifrost.source.db.LogLevel;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
-import org.jboss.pnc.common.concurrent.Sequence;
+import org.jboss.pnc.bifrost.test.DbUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,11 +50,14 @@ public class SourceTest {
     @Inject
     Source source;
 
+    @Inject
+    DbUtils dbUtils;
+
     private final Map<String, List<String>> noFilters = Collections.emptyMap();
 
     @Test
-    public void shouldReadFromDBSource() throws IOException {
-        insertLines();
+    public void shouldReadFromDBSource() throws Exception {
+        dbUtils.insertLines(10, 1L, SourceTest.class.toString());
         List<Line> lines = new ArrayList<>();
         Consumer<Line> onLine = (line) -> {
             logger.debug("Received line: {}.", line);
@@ -69,22 +67,4 @@ public class SourceTest {
         Assertions.assertEquals(10, lines.size());
     }
 
-    @Transactional
-    void insertLines() {
-        for (int id = 0; id < 10; id++) {
-            LogRecord logRecord = new LogRecord(
-                    Sequence.nextId(),
-                    Instant.now(),
-                    id,
-                    LogLevel.INFO,
-                    String.class.toString(),
-                    "My message " + id,
-                    123123L,
-                    0L,
-                    "abc123",
-                    false,
-                    1L);
-            logRecord.persist();
-        }
-    }
 }

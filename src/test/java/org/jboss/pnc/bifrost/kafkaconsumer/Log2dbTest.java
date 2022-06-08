@@ -24,16 +24,25 @@ import io.quarkus.test.junit.QuarkusTest;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.jboss.pnc.bifrost.em.HibernateMetric;
+import org.jboss.pnc.bifrost.em.HibernateStatsUtils;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.bifrost.test.DbUtils;
+import org.jboss.pnc.common.concurrent.Sequence;
+import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -57,6 +66,9 @@ public class Log2dbTest {
     @Inject
     DbUtils dbUtils;
 
+    @Inject
+    EntityManager entityManager;
+
     @Test
     @Timeout(10)
     public void logsShouldBeStored() throws InterruptedException {
@@ -66,19 +78,33 @@ public class Log2dbTest {
                 semaphore.release();
             }
         });
-        emitMessages(10, "org.apache");
+        emitMessages(10, "org.apache"); // excluded by config
         emitMessages(10, "org.jboss.pnc");
         semaphore.acquire();
-        List<LogRecord> stored = LogRecord.listAll();
+        List<LogLine> stored = LogLine.listAll();
         Assertions.assertEquals(10, stored.size());
         stored.forEach(r -> {
             if (r.getLoggerName().startsWith("org.apache")) {
                 Assertions.fail("LoggerName org.apache should not be stored.");
             }
         });
+
+        SessionFactory sessionFactory = ((Session) entityManager.getDelegate()).getSessionFactory();
+        SortedMap<String, Map<String, HibernateMetric>> cacheEntitiesStats = HibernateStatsUtils
+                .getSecondLevelCacheEntitiesStats(sessionFactory.getStatistics());
+        log.info("Cache stat: ", cacheEntitiesStats);
+        cacheEntitiesStats.forEach((k, v) -> {
+            log.info("  " + k);
+            v.forEach((k1, v1) -> {
+                log.info("    " + k1 + ": " + v1);
+            });
+        });
+
     }
 
     private void emitMessages(Integer numberOfMessages, String loggerName) {
+        Map<String, Object> mdc = Collections
+                .singletonMap("processContext", LongBase32IdConverter.toString(Sequence.nextId()));
         for (int count = 0; count < numberOfMessages; count++) {
             Map<String, Object> record = new HashMap<>();
             record.put("@timestamp", "2022-05-18T15:20:47.536Z");
@@ -86,6 +112,7 @@ public class Log2dbTest {
             record.put("level", "INFO");
             record.put("loggerName", loggerName);
             record.put("message", "Me message.");
+            record.put("mdc", mdc);
 
             try {
                 String data = mapper.writeValueAsString(record);

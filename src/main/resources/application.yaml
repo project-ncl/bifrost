@@ -30,6 +30,9 @@ quarkus:
       format: '%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n'
       enable: 'true'
     level: INFO
+  hibernate-orm:
+    database:
+      generation: validate
   index-dependency:
     elasticsearch:
       artifact-id: elasticsearch
@@ -62,6 +65,8 @@ bifrost:
   sourcePollThreads: 4
 '%test':
   quarkus:
+    log:
+      min-level: TRACE
     datasource:
       jdbc:
         url: jdbc:h2:tcp://localhost/mem:test
@@ -69,6 +74,10 @@ bifrost:
     hibernate-orm:
       database:
         generation: drop-and-create
+      log:
+        sql: true
+        bind-parameters: true
+      statistics: true
   bifrost:
     sourceClass: org.jboss.pnc.bifrost.source.db.DatabaseSource
   kafka2db:
