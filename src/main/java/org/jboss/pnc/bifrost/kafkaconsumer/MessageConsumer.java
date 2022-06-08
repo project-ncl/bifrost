@@ -25,7 +25,8 @@ import io.smallrye.common.annotation.Blocking;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogEntryRepository;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -55,6 +56,9 @@ public class MessageConsumer {
     @Inject
     StoredCounter storedCounter;
 
+    @Inject
+    private LogEntryRepository logEntryRepository;
+
     Filter acceptFilter;
 
     private Counter errCounter;
@@ -62,7 +66,6 @@ public class MessageConsumer {
     @PostConstruct
     void initMetrics() {
         errCounter = registry.counter(className + ".error.count");
-        // TODO test
         acceptFilter = new Filter(configuration.acceptFilters());
     }
 
@@ -75,12 +78,13 @@ public class MessageConsumer {
     @Transactional
     public void consume(String json) {
         try {
-            LogRecord record = mapper.readValue(json, LogRecord.class);
+            LogLine logLine = mapper.readValue(json, LogLine.class);
             if (log.isTraceEnabled()) {
-                log.trace(record.toString());
+                log.trace(logLine.toString());
             }
-            if (acceptFilter.match(record)) {
-                record.persistAndFlush();
+            if (acceptFilter.match(logLine)) {
+                logLine.setLogEntry(logEntryRepository.get(logLine.getLogEntry()));
+                logLine.persistAndFlush();
                 storedCounter.increment();
             }
         } catch (Exception e) {

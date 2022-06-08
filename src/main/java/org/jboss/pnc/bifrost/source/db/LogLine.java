@@ -27,12 +27,15 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Type;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -43,38 +46,30 @@ import java.time.Instant;
 @ToString
 @Table(
         indexes = {
-                @Index(name = "idx_timestamp", columnList = "timestamp"),
-                @Index(name = "idx_sequence", columnList = "sequence"),
-                @Index(name = "idx_loggerName", columnList = "loggerName"),
-                @Index(name = "idx_processContext", columnList = "processContext"),
-                @Index(name = "idx_processContextVariant", columnList = "processContextVariant"),
-                @Index(name = "idx_requestContext", columnList = "requestContext") })
-@JsonDeserialize(using = LogRecordDeserializer.class)
-public class LogRecord extends PanacheEntityBase {
+                @Index(name = "idx_logline_eventtimestamp", columnList = "eventTimestamp"),
+                @Index(name = "idx_logline_sequence", columnList = "sequence"),
+                @Index(name = "idx_logline_loggerName", columnList = "loggerName") })
+@JsonDeserialize(using = LogLineDeserializer.class)
+@Cacheable
+public class LogLine extends PanacheEntityBase {
 
     @Id
     long id;
 
-    Instant timestamp;
+    @ManyToOne
+    LogEntry logEntry;
+
+    OffsetDateTime eventTimestamp;
 
     int sequence;
 
+    @Column(name = "level_id")
     LogLevel level;
 
     String loggerName;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
-    String logLine;
-
-    Long processContext;
-
-    Long processContextVariant;
-
-    String requestContext;
-
-    Boolean temp;
-
-    Long buildId;
+    String line;
 
 }

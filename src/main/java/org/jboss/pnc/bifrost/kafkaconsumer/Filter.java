@@ -18,7 +18,7 @@
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
 import org.jboss.pnc.bifrost.source.db.LogLevel;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class Filter {
         this.logFilters = logFilters;
     }
 
-    public boolean match(LogRecord record) {
+    public boolean match(LogLine record) {
         if (logFilters.isEmpty()) {
             return true;
         }

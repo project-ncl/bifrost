@@ -24,7 +24,7 @@ import org.jboss.logging.Logger;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.source.db.DatabaseSource;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.bifrost.test.DbUtils;
 import org.jboss.pnc.bifrost.test.Wait;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,12 +67,12 @@ public class DatabaseSourceTest {
     @Transactional
     public void init() throws Exception {
         // clean up the DB
-        LogRecord.deleteAll();
+        LogLine.deleteAll();
     }
 
     @Test
     public void shouldReadData() throws Exception {
-        dbUtils.insertLine(10, 1, DEFAULT_LOGGER);
+        dbUtils.insertLines(10, 1, DEFAULT_LOGGER);
         Map<String, List<String>> noFilters = Collections.emptyMap();
 
         List<Line> receivedLines = new ArrayList<>();
@@ -87,10 +87,10 @@ public class DatabaseSourceTest {
 
     @Test
     public void shouldGetLinesMatchingCtxAndLoggerPrefix() throws Exception {
-        dbUtils.insertLine(2, 1, "other." + DEFAULT_LOGGER);
-        dbUtils.insertLine(2, 1, DEFAULT_LOGGER);
-        dbUtils.insertLine(5, 2, DEFAULT_LOGGER);
-        dbUtils.insertLine(5, 2, DEFAULT_LOGGER + ".build-log");
+        dbUtils.insertLines(2, 1, "other." + DEFAULT_LOGGER);
+        dbUtils.insertLines(2, 1, DEFAULT_LOGGER);
+        dbUtils.insertLines(5, 2, DEFAULT_LOGGER);
+        dbUtils.insertLines(5, 2, DEFAULT_LOGGER + ".build-log");
 
         List<Line> anyLines = new ArrayList<>();
         Consumer<Line> anyLine = (line -> {
@@ -104,7 +104,7 @@ public class DatabaseSourceTest {
         Assertions.assertEquals(12, anyLines.size());
 
         Map<String, List<String>> matchFilters = new HashMap<>();
-        matchFilters.put("processContext", Arrays.asList("2"));
+        matchFilters.put("mdc.processContext", Arrays.asList("2"));
         List<Line> matchingLines = new ArrayList<>();
         Consumer<Line> onLine = (line -> {
             logger.info("Found line: " + line);
@@ -116,7 +116,7 @@ public class DatabaseSourceTest {
 
     @Test
     public void shouldGetLinesAfter() throws Exception {
-        dbUtils.insertLine(10, 1, DEFAULT_LOGGER, Instant.now());
+        dbUtils.insertLines(10, 1, DEFAULT_LOGGER, OffsetDateTime.now());
 
         List<Line> lines = new ArrayList<>();
         Consumer<Line> onLine = (line -> {
@@ -142,7 +142,7 @@ public class DatabaseSourceTest {
 
     @Test
     public void shouldGetLinesAfterDescending() throws Exception {
-        dbUtils.insertLine(10, 1, DEFAULT_LOGGER, Instant.now());
+        dbUtils.insertLines(10, 1, DEFAULT_LOGGER, OffsetDateTime.now());
 
         List<Line> lines = new ArrayList<>();
         Consumer<Line> onLine = (line -> {

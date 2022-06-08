@@ -17,7 +17,6 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +30,8 @@ import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 /**
@@ -38,21 +39,21 @@ import java.util.Optional;
  *
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-public class LogRecordDeserializer extends StdDeserializer<LogRecord> {
+public class LogLineDeserializer extends StdDeserializer<LogLine> {
 
-    private final Logger logger = Logger.getLogger(LogRecordDeserializer.class);
+    private final Logger logger = Logger.getLogger(LogLineDeserializer.class);
 
-    public LogRecordDeserializer() {
-        super(LogRecord.class);
+    public LogLineDeserializer() {
+        super(LogLine.class);
     }
 
-    protected LogRecordDeserializer(Class<?> vc) {
+    protected LogLineDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public LogRecord deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException, JacksonException {
+    public LogLine deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         int sequence = Json.<Integer> getNumber(node, "/sequence").orElse(0);
@@ -84,18 +85,22 @@ public class LogRecordDeserializer extends StdDeserializer<LogRecord> {
                 logLine = "";
             }
         }
-        return new LogRecord(
+
+        LogEntry logEntry = new LogEntry(
                 Sequence.nextId(),
-                timestamp,
-                sequence,
-                LogLevel.valueOf(level.toUpperCase()),
-                loggerName,
-                logLine,
                 LongBase32IdConverter.toLong(processContext),
-                LongBase32IdConverter.toLong(processContextVariant),
+                processContextVariant,
                 requestContext,
                 temp,
                 buildId);
+        return new LogLine(
+                Sequence.nextId(),
+                logEntry,
+                OffsetDateTime.ofInstant(timestamp, ZoneOffset.UTC),
+                sequence,
+                LogLevel.valueOf(level.toUpperCase()),
+                loggerName,
+                logLine);
     }
 
 }

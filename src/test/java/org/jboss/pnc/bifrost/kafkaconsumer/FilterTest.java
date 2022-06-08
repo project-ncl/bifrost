@@ -18,7 +18,7 @@
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
 import org.jboss.pnc.bifrost.source.db.LogLevel;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,8 +50,8 @@ public class FilterTest {
         Assertions.assertFalse(filter.match(simpleLogRecord("io.quarkus", LogLevel.ERROR)));
     }
 
-    private LogRecord simpleLogRecord(String loggerName, LogLevel level) {
-        LogRecord record = new LogRecord();
+    private LogLine simpleLogRecord(String loggerName, LogLevel level) {
+        LogLine record = new LogLine();
         record.setLoggerName(loggerName);
         record.setLevel(level);
         return record;

@@ -27,6 +27,7 @@ import io.quarkus.panache.common.Sort;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.source.Source;
+import org.jboss.pnc.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,15 +59,22 @@ public class DatabaseSource implements Source {
     @Inject
     MeterRegistry registry;
 
+    @Inject
+    FieldMapping fieldMapping;
+
     private Counter errCounter;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME
             .withZone(ZoneId.of("UTC"));
-    private Map<String, Class> logRecordTypes;
+
+    /**
+     * Map<EntityClass, Map<FieldName, FieldType>>
+     */
+    private Map<Class, Map<String, Class>> fieldTypes;
 
     @PostConstruct
     void initMetrics() {
         errCounter = registry.counter(DatabaseSource.class.getName() + ".error.count");
-        logRecordTypes = getLogRecordFieldsType();
+        fieldTypes = Map.of(LogLine.class, getFieldsType(LogLine.class), LogEntry.class, getFieldsType(LogEntry.class));
     }
 
     @Override
@@ -90,12 +98,22 @@ public class DatabaseSource implements Source {
                 prefixFilters,
                 searchAfter,
                 direction);
-        Sort sort = Sort.by("timestamp", "sequence", "id").direction(getSortDirection(direction));
+        Sort sort = Sort.by("logLine.eventTimestamp", "logLine.sequence", "logLine.id")
+                .direction(getSortDirection(direction));
 
-        PanacheQuery<PanacheEntityBase> query = LogRecord
-                .find(queryWithParameters.query, sort, queryWithParameters.parameters);
+        String filter;
+        if (!Strings.isEmpty(queryWithParameters.query)) {
+            filter = " where " + queryWithParameters.query;
+        } else {
+            filter = "";
+        }
+
+        PanacheQuery<PanacheEntityBase> query = LogLine.find(
+                "from LogLine logLine left join fetch logLine.logEntry logEntry" + filter,
+                sort,
+                queryWithParameters.parameters);
         query.range(0, fetchSize + 1);
-        List<LogRecord> rows = query.list();
+        List<LogLine> rows = query.list();
 
         logger.info("Received {} rows.", rows.size());
 
@@ -105,13 +123,11 @@ public class DatabaseSource implements Source {
          * loop until fetchSize or all the elements are read note that (fetchSize + 1) is used as a limit in the query
          * to check if there are more results
          */
-        Iterator<LogRecord> rowsIterator = rows.iterator();
+        Iterator<LogLine> rowsIterator = rows.iterator();
         while (rowsIterator.hasNext() && rowNum < fetchSize) {
-            logger.info(">>> {}", rowNum);
             rowNum++;
-            LogRecord row = rowsIterator.next();
+            LogLine row = rowsIterator.next();
             boolean last = !rowsIterator.hasNext();
-            logger.info("Getting line: ", row);
             Line line = getLine(row, last);
             onLine.accept(line);
         }
@@ -122,20 +138,21 @@ public class DatabaseSource implements Source {
         }
     }
 
-    private Line getLine(LogRecord row, boolean last) {
+    private Line getLine(LogLine row, boolean last) {
         Map<String, String> mdc = new HashMap<>();
-        Optional.ofNullable(row.getProcessContext()).ifPresent(v -> mdc.put("processContext", Long.toString(v)));
-        Optional.ofNullable(row.getProcessContextVariant())
-                .ifPresent(v -> mdc.put("processContextVariant", Long.toString(v)));
-        Optional.ofNullable(row.getBuildId()).ifPresent(v -> mdc.put("buildId", Long.toString(v)));
-        mdc.put("requestContext", row.getRequestContext());
+        Optional.ofNullable(row.getLogEntry().getProcessContext())
+                .ifPresent(v -> mdc.put("processContext", Long.toString(v)));
+        Optional.ofNullable(row.getLogEntry().getProcessContextVariant())
+                .ifPresent(v -> mdc.put("processContextVariant", v));
+        Optional.ofNullable(row.getLogEntry().getBuildId()).ifPresent(v -> mdc.put("buildId", Long.toString(v)));
+        mdc.put("requestContext", row.getLogEntry().getRequestContext());
 
         return Line.newBuilder()
                 .id(Long.toString(row.getId()))
-                .timestamp(DATE_TIME_FORMATTER.format(row.getTimestamp()))
+                .timestamp(DATE_TIME_FORMATTER.format(row.getEventTimestamp()))
                 .sequence(Integer.toString(row.getSequence()))
                 .logger(row.getLoggerName())
-                .message(row.getLogLine())
+                .message(row.getLine())
                 .last(last)
                 .mdc(mdc)
                 .build();
@@ -156,16 +173,19 @@ public class DatabaseSource implements Source {
         Parameters parameters = new Parameters();
         List<String> queryParts = new ArrayList<>();
 
-        matchFilters.forEach((field, values) -> {
+        matchFilters.forEach((dtoField, values) -> {
             List<String> valueParts = new ArrayList<>();
             for (int valueIndex = 0; valueIndex < values.size(); valueIndex++) {
-                String paramName = "m" + field + valueIndex;
-                valueParts.add(field + " = :" + paramName);
-                parameters.and(paramName, parseType(values.get(valueIndex), field));
+                FieldMapping.Field field = fieldMapping.getDbField(dtoField)
+                        .orElseThrow(() -> new InvalidFieldException("The field [" + dtoField + "] is not mapped."));
+                String paramName = "m" + field.name + valueIndex;
+                valueParts.add(field.name + " = :" + paramName);
+                parameters.and(paramName, castValueToFieldType(values.get(valueIndex), field));
             }
             queryParts.add(valueParts.stream().collect(Collectors.joining(" or ")));
         });
 
+        // 'like' queries are string only, no need to convert the value
         prefixFilters.forEach((field, values) -> {
             List<String> valueParts = new ArrayList<>();
             for (int valueIndex = 0; valueIndex < values.size(); valueIndex++) {
@@ -178,9 +198,11 @@ public class DatabaseSource implements Source {
 
         searchAfter.ifPresent(afterLine -> {
             if (Direction.DESC.equals(direction)) {
-                queryParts.add("(timestamp, sequence, id) < (:afterTimestamp, :afterSequence ,:afterId)");
+                queryParts.add(
+                        "(logLine.eventTimestamp, logLine.sequence, logLine.id) < (:afterTimestamp, :afterSequence ,:afterId)");
             } else {
-                queryParts.add("(timestamp, sequence, id) > (:afterTimestamp, :afterSequence ,:afterId)");
+                queryParts.add(
+                        "(logLine.eventTimestamp, logLine.sequence, logLine.id) > (:afterTimestamp, :afterSequence ,:afterId)");
             }
 
             parameters.and("afterTimestamp", afterLine.getTimestamp());
@@ -192,8 +214,8 @@ public class DatabaseSource implements Source {
         return new QueryWithParameters(query, parameters);
     }
 
-    private Object parseType(String value, String fieldName) {
-        Class type = logRecordTypes.get(fieldName);
+    private Object castValueToFieldType(String value, FieldMapping.Field dbField) {
+        Class type = fieldTypes.get(dbField.clazz).get(dbField.name);
         if (type.equals(String.class)) {
             return value;
         } else if (type.equals(int.class) || type.equals(Integer.class)) {
@@ -209,9 +231,9 @@ public class DatabaseSource implements Source {
         }
     }
 
-    private Map<String, Class> getLogRecordFieldsType() {
+    private Map<String, Class> getFieldsType(Class clazz) {
         Map<String, Class> types = new HashMap<>();
-        Field[] fields = LogRecord.class.getDeclaredFields();
+        Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             types.put(field.getName(), field.getType());
         }

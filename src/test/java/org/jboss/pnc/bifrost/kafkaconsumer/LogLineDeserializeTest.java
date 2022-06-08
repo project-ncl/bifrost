@@ -19,14 +19,14 @@ package org.jboss.pnc.bifrost.kafkaconsumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.pnc.bifrost.source.db.LogRecord;
+import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
-public class LogRecordDeserializeTest {
+public class LogLineDeserializeTest {
 
     @Test
     public void shouldDeserializeLogRecord() throws JsonProcessingException {
@@ -39,8 +39,8 @@ public class LogRecordDeserializeTest {
                 + "    \"threadId\": 26350,\n" + "    \"mdc\": { \"processContext\": \"12345\" },\n"
                 + "    \"ndc\": \"\",\n" + "    \"hostName\": \"localhost\",\n"
                 + "    \"processName\": \"jboss-modules.jar\",\n" + "    \"processId\": 1522\n  }";
-        LogRecord logRecord = mapper.readValue(json, LogRecord.class);
-        Assertions.assertEquals("org.jboss.pnc.kafka2db", logRecord.getLoggerName());
-        Assertions.assertEquals(12345L, logRecord.getProcessContext());
+        LogLine logLine = mapper.readValue(json, LogLine.class);
+        Assertions.assertEquals("org.jboss.pnc.kafka2db", logLine.getLoggerName());
+        Assertions.assertEquals(12345L, logLine.getLogEntry().getProcessContext());
     }
 }
