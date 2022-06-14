@@ -127,8 +127,8 @@ public class DataProvider {
      * Example filters:
      *
      * "prefixFilters": loggerName.keyword: org.jboss.pnc.causeway|org.jboss.pnc._userlog_,
-     * level.keyword:INFO|ERROR|WARN, "matchFilters": mdc.buildId.keyword:ARTPKTKTQGAAC,
-     * mdc.processContext.keyword:317211334116737024
+     * level:INFO|ERROR|WARN, "matchFilters": mdc.buildId:317211334116737472,
+     * mdc.processContext:317211334116737024
      */
     protected void readFromSource(
             String matchFilters,
