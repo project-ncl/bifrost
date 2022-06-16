@@ -17,6 +17,15 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
+import org.jboss.pnc.bifrost.source.db.converter.BooleanConverter;
+import org.jboss.pnc.bifrost.source.db.converter.IntegerConverter;
+import org.jboss.pnc.bifrost.source.db.converter.LogLevelConverter;
+import org.jboss.pnc.bifrost.source.db.converter.LongConverter;
+import org.jboss.pnc.bifrost.source.db.converter.OffsetDateTimeConverter;
+import org.jboss.pnc.bifrost.source.db.converter.idConverter;
+import org.jboss.pnc.bifrost.source.db.converter.StringConverter;
+import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
+
 import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.Optional;
@@ -33,38 +42,55 @@ public class FieldMapping {
     private final Map<String, Field> mappings;
 
     public FieldMapping() {
+        var stringConverter = new StringConverter();
+        var booleanConverter = new BooleanConverter();
+        var integerConverter = new IntegerConverter();
+        var longConverter = new LongConverter();
+        var offsetDateTimeConverter = new OffsetDateTimeConverter();
+        var idConverter = new idConverter();
+        var logLevelConverter = new LogLevelConverter();
+
         // .keyword is used for backward compatibility
         this.mappings = Map.ofEntries(
-                Map.entry("id", Field.from(LogLine.class, "id")),
-                Map.entry("timestamp", Field.from(LogLine.class, "eventTimestamp")),
-                Map.entry("sequence", Field.from(LogLine.class, "sequence")),
-                Map.entry("loggerName", Field.from(LogLine.class, "loggerName")),
-                Map.entry("loggerName.keyword", Field.from(LogLine.class, "loggerName")),
-                Map.entry("level", Field.from(LogLine.class, "level")),
-                Map.entry("level.keyword", Field.from(LogLine.class, "level")),
-                Map.entry("mdc.processContext", Field.from(LogEntry.class, "processContext")),
-                Map.entry("mdc.processContext.keyword", Field.from(LogEntry.class, "processContext")),
-                Map.entry("mdc.processContextVariant", Field.from(LogEntry.class, "processContextVariant")),
-                Map.entry("mdc.requestContext", Field.from(LogEntry.class, "requestContext")),
-                Map.entry("mdc.buildId", Field.from(LogEntry.class, "buildId")),
-                Map.entry("mdc.buildId.keyword", Field.from(LogEntry.class, "logEntry.buildId")));
+                Map.entry("id", Field.from(LogLine.class, "id", longConverter)),
+                Map.entry("timestamp", Field.from(LogLine.class, "eventTimestamp", offsetDateTimeConverter)),
+                Map.entry("sequence", Field.from(LogLine.class, "sequence", integerConverter)),
+                Map.entry("loggerName", Field.from(LogLine.class, "loggerName", stringConverter)),
+                Map.entry("loggerName.keyword", Field.from(LogLine.class, "loggerName", stringConverter)),
+                Map.entry("level", Field.from(LogLine.class, "level", logLevelConverter)),
+                Map.entry("level.keyword", Field.from(LogLine.class, "level", logLevelConverter)),
+                Map.entry("mdc.processContext", Field.from(LogEntry.class, "processContext", idConverter)),
+                Map.entry("mdc.processContext.keyword", Field.from(LogEntry.class, "processContext", idConverter)),
+                Map.entry(
+                        "mdc.processContextVariant",
+                        Field.from(LogEntry.class, "processContextVariant", stringConverter)),
+                Map.entry("mdc.requestContext", Field.from(LogEntry.class, "requestContext", stringConverter)),
+                Map.entry("mdc.buildId", Field.from(LogEntry.class, "buildId", idConverter)),
+                Map.entry("mdc.buildId.keyword", Field.from(LogEntry.class, "buildId", idConverter)),
+                Map.entry("mdc.tmp", Field.from(LogEntry.class, "temporary", booleanConverter)));
     }
 
-    public Optional<Field> getDbField(String dtoField) {
+    public Optional<Field> getField(String dtoField) {
         return Optional.ofNullable(mappings.get(dtoField));
     }
 
-    public static class Field {
-        Class clazz;
-        String name;
+    public static class Field<T> {
+        final Class clazz;
+        final String name;
+        final ValueConverter<T> valueConverter;
 
-        Field(Class clazz, String name) {
+        public Field(Class clazz, String name, ValueConverter valueConverter) {
             this.clazz = clazz;
             this.name = name;
+            this.valueConverter = valueConverter;
         }
 
-        public static Field from(Class clazz, String fieldName) {
-            return new Field(clazz, fieldName);
+        public static <T> Field<T> from(Class clazz, String fieldName, ValueConverter<T> valueConverter) {
+            return new Field(clazz, fieldName, valueConverter);
+        }
+
+        public ValueConverter valueConverter() {
+            return valueConverter;
         }
     }
 }

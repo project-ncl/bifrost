@@ -23,10 +23,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.jboss.logging.Logger;
 import org.jboss.pnc.bifrost.kafkaconsumer.MissingValueException;
+import org.jboss.pnc.bifrost.source.db.converter.idConverter;
+import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
 import org.jboss.pnc.common.Json;
 import org.jboss.pnc.common.Strings;
 import org.jboss.pnc.common.concurrent.Sequence;
-import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -42,6 +43,8 @@ import java.util.Optional;
 public class LogLineDeserializer extends StdDeserializer<LogLine> {
 
     private final Logger logger = Logger.getLogger(LogLineDeserializer.class);
+
+    private final ValueConverter<Long> processContextConverter = new idConverter();
 
     public LogLineDeserializer() {
         super(LogLine.class);
@@ -88,7 +91,7 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
 
         LogEntry logEntry = new LogEntry(
                 Sequence.nextId(),
-                LongBase32IdConverter.toLong(processContext),
+                processContextConverter.convert(processContext),
                 processContextVariant,
                 requestContext,
                 temp,

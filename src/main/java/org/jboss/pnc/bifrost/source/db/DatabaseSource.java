@@ -35,8 +35,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -66,15 +64,9 @@ public class DatabaseSource implements Source {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME
             .withZone(ZoneId.of("UTC"));
 
-    /**
-     * Map<EntityClass, Map<FieldName, FieldType>>
-     */
-    private Map<Class, Map<String, Class>> fieldTypes;
-
     @PostConstruct
     void initMetrics() {
         errCounter = registry.counter(DatabaseSource.class.getName() + ".error.count");
-        fieldTypes = Map.of(LogLine.class, getFieldsType(LogLine.class), LogEntry.class, getFieldsType(LogEntry.class));
     }
 
     @Override
@@ -176,11 +168,14 @@ public class DatabaseSource implements Source {
         matchFilters.forEach((dtoField, values) -> {
             List<String> valueParts = new ArrayList<>();
             for (int valueIndex = 0; valueIndex < values.size(); valueIndex++) {
-                FieldMapping.Field field = fieldMapping.getDbField(dtoField)
+                FieldMapping.Field field = fieldMapping.getField(dtoField)
                         .orElseThrow(() -> new InvalidFieldException("The field [" + dtoField + "] is not mapped."));
+
                 String paramName = "m" + field.name + valueIndex;
                 valueParts.add(field.name + " = :" + paramName);
-                parameters.and(paramName, castValueToFieldType(values.get(valueIndex), field));
+
+                String value = values.get(valueIndex);
+                parameters.and(paramName, field.valueConverter().convert(value));
             }
             queryParts.add(valueParts.stream().collect(Collectors.joining(" or ")));
         });
@@ -212,32 +207,6 @@ public class DatabaseSource implements Source {
 
         String query = queryParts.stream().collect(Collectors.joining(" and "));
         return new QueryWithParameters(query, parameters);
-    }
-
-    private Object castValueToFieldType(String value, FieldMapping.Field dbField) {
-        Class type = fieldTypes.get(dbField.clazz).get(dbField.name);
-        if (type.equals(String.class)) {
-            return value;
-        } else if (type.equals(int.class) || type.equals(Integer.class)) {
-            return Integer.parseInt(value);
-        } else if (type.equals(long.class) || type.equals(Long.class)) {
-            return Long.parseLong(value);
-        } else if (type.equals(Instant.class)) {
-            return Instant.parse(value);
-        } else if (type.equals(Boolean.class)) {
-            return Boolean.getBoolean(value);
-        } else {
-            throw new RuntimeException("Unknown type: " + type);
-        }
-    }
-
-    private Map<String, Class> getFieldsType(Class clazz) {
-        Map<String, Class> types = new HashMap<>();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            types.put(field.getName(), field.getType());
-        }
-        return types;
     }
 
     private class QueryWithParameters {
