@@ -220,6 +220,9 @@
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.platform.version}</version>
         <extensions>true</extensions>
+        <configuration>
+          <finalName>bifrost-server</finalName>
+        </configuration>
         <executions>
           <execution>
             <goals>
