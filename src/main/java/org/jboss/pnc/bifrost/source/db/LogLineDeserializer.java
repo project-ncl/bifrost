@@ -22,9 +22,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.jboss.logging.Logger;
-import org.jboss.pnc.bifrost.kafkaconsumer.MissingValueException;
-import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
+import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 import org.jboss.pnc.common.Json;
 import org.jboss.pnc.common.Strings;
 import org.jboss.pnc.common.concurrent.Sequence;
@@ -67,9 +66,8 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
         });
 
         Instant timestamp = Instant.parse(time);
-        String level = Json.getText(node, "/level").orElseThrow(() -> new MissingValueException("Missing level."));
-        String loggerName = Json.getText(node, "/loggerName")
-                .orElseThrow(() -> new MissingValueException("Missing loggerName."));
+        String level = Json.getText(node, "/level").orElse(null);
+        String loggerName = Json.getText(node, "/loggerName").orElse(null);
         String processContext = Json.getText(node, "/mdc/processContext").orElse(null);
         String processContextVariant = Json.getText(node, "/mdc/processContextVariant").orElse(null);
         String requestContext = Json.getText(node, "/mdc/requestContext").orElse(null);
