@@ -31,6 +31,8 @@ quarkus:
       enable: 'true'
     level: INFO
   hibernate-orm:
+    jdbc:
+      statement-batch-size: 200
     database:
       generation: validate
   index-dependency:
@@ -46,9 +48,12 @@ quarkus:
         enabled: true
   datasource:
     db-kind: ${QUARKUS_DATASOURCE:postgresql}
-    jdbc.url: ${QUARKUS_DATASOURCE_URL:}
-    username: ${QUARKUS_DATASOURCE_USERNAME:}
-    password: ${QUARKUS_DATASOURCE_PASSWORD:}
+    jdbc:
+      url: jdbc:postgresql://localhost:5444/build_logs_master
+    username: jmichalo
+    #    jdbc:
+    #      url: jdbc:h2:tcp://localhost/mem:test
+    #    db-kind: h2
 elasticsearch:
   hosts: https://host:443
   indexes: test-*
@@ -61,8 +66,14 @@ bifrost:
     maxBackOffCycles: 10
     pollIntervalMillis: 250
     timeOutMillis: 300000
-  defaultSourceFetchSize: 100
+  defaultSourceFetchSize: 9999
   sourcePollThreads: 4
+  sourceClass: org.jboss.pnc.bifrost.source.elasticsearch.ElasticSearch
+kafka2db:
+  accept-filters:
+    - logger-name-prefix: org.jboss.pnc
+      level: INFO
+  hostname: localhost-0
 '%test':
   quarkus:
     log:

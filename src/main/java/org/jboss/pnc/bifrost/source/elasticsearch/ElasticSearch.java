@@ -206,6 +206,7 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
         String logger = getString(source, "loggerName");
         String message = getString(source, "message");
         String stackTrace = getString(source, "stackTrace");
+        String logLevel = getString(source, "level");
 
         Map<String, String> mdc = (Map<String, String>) source.get("mdc");
 
@@ -218,6 +219,7 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
                 .last(last)
                 .mdc(mdc)
                 .stackTrace(stackTrace)
+                .logLevel(logLevel)
                 .build();
     }
 

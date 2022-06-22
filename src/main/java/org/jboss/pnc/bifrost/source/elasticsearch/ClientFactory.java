@@ -93,7 +93,11 @@ public class ClientFactory {
                         .loadTrustMaterial(truststore, new TrustSelfSignedStrategy())
                         .loadKeyMaterial(truststore, config.getKeyPass().get().toCharArray());
                 final SSLContext sslContext = sslBuilder.build();
-
+                builder.setRequestConfigCallback(
+                        (requestConfigBuilder -> requestConfigBuilder
+                                .setConnectTimeout(5000)
+                                .setSocketTimeout(600000)
+                                .setConnectionRequestTimeout(500)));
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {
                     httpClientBuilder.setSSLContext(sslContext);
                     httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
@@ -102,7 +106,7 @@ public class ClientFactory {
                 });
             }
 
-            RestClient lowLevelRestClient = builder.build();
+            RestClient lowLevelRestClient = builder.setMaxRetryTimeoutMillis(600000).build();
             return lowLevelRestClient;
         } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException
                 | CertificateException e) {

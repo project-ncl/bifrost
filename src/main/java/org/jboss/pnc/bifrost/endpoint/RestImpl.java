@@ -33,6 +33,7 @@ import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.jboss.pnc.common.security.Md5;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 import javax.ws.rs.ServerErrorException;
@@ -59,6 +60,7 @@ import java.util.function.Consumer;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @Path("/")
+@ApplicationScoped
 public class RestImpl implements Bifrost {
 
     private static final String className = RestImpl.class.getName();

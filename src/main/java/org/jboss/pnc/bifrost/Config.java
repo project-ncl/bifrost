@@ -34,7 +34,7 @@ public class Config {
     @ConfigProperty(name = "bifrost.sourceClass")
     String sourceClass;
 
-    @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "100")
+    @ConfigProperty(name = "bifrost.defaultSourceFetchSize", defaultValue = "10000")
     int defaultSourceFetchSize;
 
     @ConfigProperty(name = "bifrost.sourcePollThreads", defaultValue = "4")
