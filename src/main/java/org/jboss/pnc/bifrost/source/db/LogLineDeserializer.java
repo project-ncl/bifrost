@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.jboss.logging.Logger;
+import org.jboss.pnc.bifrost.common.DateParser;
 import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
 import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 import org.jboss.pnc.common.Json;
@@ -65,7 +66,7 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
             return Instant.now().toString();
         });
 
-        Instant timestamp = Instant.parse(time);
+        Instant timestamp = DateParser.parseTime(time);
         String level = Json.getText(node, "/level").orElse(null);
         String loggerName = Json.getText(node, "/loggerName").orElse(null);
         String processContext = Json.getText(node, "/mdc/processContext").orElse(null);
@@ -103,5 +104,4 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
                 loggerName,
                 logLine);
     }
-
 }
