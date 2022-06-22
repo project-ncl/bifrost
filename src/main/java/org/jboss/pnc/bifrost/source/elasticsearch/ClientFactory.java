@@ -94,8 +94,7 @@ public class ClientFactory {
                         .loadKeyMaterial(truststore, config.getKeyPass().get().toCharArray());
                 final SSLContext sslContext = sslBuilder.build();
                 builder.setRequestConfigCallback(
-                        (requestConfigBuilder -> requestConfigBuilder
-                                .setConnectTimeout(5000)
+                        (requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000)
                                 .setSocketTimeout(600000)
                                 .setConnectionRequestTimeout(500)));
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {

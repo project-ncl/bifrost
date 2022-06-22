@@ -10,6 +10,7 @@ import org.jboss.pnc.bifrost.source.db.LogEntry;
 import org.jboss.pnc.bifrost.source.db.LogLevel;
 import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.common.concurrent.Sequence;
+import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -38,29 +39,25 @@ public class MrBean {
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     @TransactionConfiguration(timeout = 3600)
-    public void queryAndSave(String logContextQuery) throws IOException, SystemException {
+    public void queryAndSave(String logContextQuery, String prefixFilters, int maxLines) throws IOException, SystemException {
         logger.info("Transaction START:" + manager.getTransaction().toString());
-        int maxLines = 10000;
         Line afterLine = null;
         List<Line> lines = null;
         Set<LogEntry> persistedEntries = new HashSet<>();
         do {
             lines = bifrost.getLines(
                     "mdc.processContext.keyword:" + logContextQuery,
-                    "loggerName.keyword:org.jboss.pnc.causeway|org.jboss.pnc._userlog_,level.keyword:INFO|ERROR|WARN",
+                    prefixFilters,
                     afterLine,
                     Direction.ASC,
                     maxLines);
             if (!lines.isEmpty()) {
                 afterLine = lines.get(lines.size() - 1);
             }
-            Map<LogEntry, List<LogLine>> groupedLines = lines
-                    .stream()
-                    .collect(
-                            groupingBy(this::extractLogEntry, mapping(this::toLine, toList())));
+            Map<LogEntry, List<LogLine>> groupedLines = lines.stream()
+                    .collect(groupingBy(this::extractLogEntry, mapping(this::toLine, toList())));
 
-
-            //persist Entries before using them as foreign keys in Lines
+            // persist Entries before using them as foreign keys in Lines
             for (LogEntry entry : groupedLines.keySet()) {
                 logger.info("Found logEntry: " + entry.toString());
                 if (!persistedEntries.contains(entry)) {
@@ -74,14 +71,15 @@ public class MrBean {
             logger.info("Persisted");
             for (var group : groupedLines.entrySet()) {
                 var entry = group.getKey();
-                var lineList = group.getValue().stream()
+                var lineList = group.getValue()
+                        .stream()
                         // avoid duplicate log lines
                         .distinct()
                         .collect(toList());
                 if (persistedEntries.contains(entry)) {
                     LogEntry finalEntry = entry;
                     entry = persistedEntries.stream()
-                            //find the hibernate managed Entry
+                            // find the hibernate managed Entry
                             .filter(finalEntry::equals)
                             .findFirst()
                             .get();
@@ -91,7 +89,7 @@ public class MrBean {
                     line.setId(Sequence.nextId());
                     line.persist();
                 }
-                logger.info("PERSISTED LINES size(" + lineList.size() +")");
+                logger.info("PERSISTED LINES size(" + lineList.size() + ")");
             }
             logger.info("ITERATION COMPLETED. SAVED ENTRIES: " + persistedEntries.toString());
         } while (lines.size() == maxLines);
@@ -106,7 +104,13 @@ public class MrBean {
         Long buildId = null;
 
         try {
-            processContext = Long.parseLong(line.getMdc().get("processContext"));
+            String processContextString = line.getMdc().get("processContext");
+            if (processContextString.startsWith("build-")) {
+                processContextString = processContextString.replace("build-", "");
+                processContext = LongBase32IdConverter.toLong(processContextString);
+            } else {
+                processContext = Long.parseLong(processContextString);
+            }
         } catch (NumberFormatException e) {
             logger.error("cant parse processContext for line " + line.toString(), e);
             return null;
@@ -121,7 +125,11 @@ public class MrBean {
         try {
             buildId = Long.parseLong(line.getMdc().get("buildId"));
         } catch (NumberFormatException e) {
-            // buildId not present, leave null
+            try {
+                buildId = LongBase32IdConverter.toLong(line.getMdc().get("buildId"));
+            } catch (Exception ex) {
+                // leave null
+            }
         }
 
         LogEntry logEntry = new LogEntry();
@@ -140,8 +148,16 @@ public class MrBean {
         logLine.setLine(line.getMessage());
         logLine.setLoggerName(line.getLoggerName());
         logLine.setEventTimestamp(OffsetDateTime.parse(DateUtil.validateAndFixInputDate(line.getTimestamp())));
-        logLine.setSequence(Integer.parseInt(line.getSequence()));
-        logLine.setLevel(LogLevel.valueOf(line.getLogLevel()));
+        try {
+            logLine.setSequence(Integer.parseInt(line.getSequence()));
+        } catch (Exception e) {
+            // sequence is null
+        }
+        try {
+            logLine.setLevel(LogLevel.valueOf(line.getLogLevel()));
+        } catch (Exception e) {
+            // log level is null
+        }
 
         return logLine;
     }

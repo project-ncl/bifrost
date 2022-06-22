@@ -55,11 +55,11 @@ quarkus:
     #      url: jdbc:h2:tcp://localhost/mem:test
     #    db-kind: h2
 elasticsearch:
-  hosts: https://host:443
-  indexes: test-*
-  #keyStorePath =
-  #keyStorePass =
-  #keyPass =
+  hosts: https://elasticsearch.datahub.redhat.com:30200
+  indexes: pnc-logs-*
+  keyStorePath: /Users/jmichalo/projects/openshift-secrets/upshift/elasticsearch-client-cert/datahub.system.logging.readall.p12
+  keyStorePass: datahubKey
+  keyPass: datahubKey
 bifrost:
   backoffrunnable:
     delayMillis: 1000
