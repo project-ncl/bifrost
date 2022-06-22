@@ -115,7 +115,7 @@ public class DataProvider {
                                 + fetchedLines[0]);
             } catch (Exception e) {
                 errCounter.increment();
-                logger.error("Error getting data from Elasticsearch.", e);
+                logger.error("Error reading data from source.", e);
                 subscriptions.unsubscribe(subscription, Subscriptions.UnsubscribeReason.NO_DATA_FROM_SOURCE);
             }
         };
