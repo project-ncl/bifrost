@@ -89,7 +89,8 @@ public class MessageConsumer {
             }
         } catch (Exception e) {
             errCounter.increment();
-            log.error("Error while saving data", e);
+            log.error("Error while reading and saving the data", e);
+            throw new RuntimeException(e);
         }
     }
 

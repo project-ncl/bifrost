@@ -181,12 +181,17 @@ public class DatabaseSource implements Source {
         });
 
         // 'like' queries are string only, no need to convert the value
-        prefixFilters.forEach((field, values) -> {
+        prefixFilters.forEach((dtoField, values) -> {
             List<String> valueParts = new ArrayList<>();
             for (int valueIndex = 0; valueIndex < values.size(); valueIndex++) {
-                String paramName = "p" + field + valueIndex;
-                valueParts.add(field + " like :" + paramName);
-                parameters.and(paramName, values.get(valueIndex) + "%");
+                FieldMapping.Field field = fieldMapping.getField(dtoField)
+                        .orElseThrow(() -> new InvalidFieldException("The field [" + dtoField + "] is not mapped."));
+
+                String paramName = "p" + field.name + valueIndex;
+                valueParts.add(field.name + " like :" + paramName);
+
+                String value = values.get(valueIndex);
+                parameters.and(paramName, field.valueConverter().convert(value) + "%");
             }
             queryParts.add(valueParts.stream().collect(Collectors.joining(" or ")));
         });
