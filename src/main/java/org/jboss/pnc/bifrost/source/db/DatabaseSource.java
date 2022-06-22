@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.ZoneId;
@@ -71,6 +72,7 @@ public class DatabaseSource implements Source {
 
     @Override
     @Timed
+    @ActivateRequestContext // prevent javax.enterprise.context.ContextNotActiveException
     public void get(
             Map<String, List<String>> matchFilters,
             Map<String, List<String>> prefixFilters,

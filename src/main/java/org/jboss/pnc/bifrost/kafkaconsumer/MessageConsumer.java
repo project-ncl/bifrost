@@ -80,7 +80,7 @@ public class MessageConsumer {
         try {
             LogLine logLine = mapper.readValue(json, LogLine.class);
             if (log.isTraceEnabled()) {
-                log.trace(logLine.toString());
+                log.trace("Received line: " + logLine.toString());
             }
             if (acceptFilter.match(logLine)) {
                 logLine.setLogEntry(logEntryRepository.get(logLine.getLogEntry()));
