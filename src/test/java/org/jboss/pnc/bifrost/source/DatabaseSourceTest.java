@@ -101,7 +101,7 @@ public class DatabaseSourceTest {
 
         // level:INFO is intentionally put as invalid prefixFilter
         Map<String, List<String>> prefixFilters = Map
-                .of("loggerName", Arrays.asList(DEFAULT_LOGGER), "level", Arrays.asList("INFO"));
+                .of("loggerName", Arrays.asList(DEFAULT_LOGGER), "level", Arrays.asList("INFO", "ERROR"));
 
         databaseSource.get(Collections.emptyMap(), prefixFilters, Optional.empty(), Direction.ASC, 100, anyLine);
         Assertions.assertEquals(12, anyLines.size());
