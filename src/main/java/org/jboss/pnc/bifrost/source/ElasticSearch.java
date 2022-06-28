@@ -117,8 +117,7 @@ public class ElasticSearch {
             // search after must contain the same fields as sort
             Object[] searchAfterTimeStampId = new Object[] {
                     Instant.from(accessor).toEpochMilli(),
-                    getSequence(searchAfter.get().getSequence(), direction),
-                    searchAfter.get().getId() };
+                    getSequence(searchAfter.get().getSequence(), direction) };
             sourceBuilder.searchAfter(searchAfterTimeStampId);
         } else {
             // TODO tailFromNow vs tailFromBeginning
