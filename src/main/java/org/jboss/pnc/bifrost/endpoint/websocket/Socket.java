@@ -184,16 +184,7 @@ public class Socket {
     private SendHandler lineResponseHandler(Session session) {
         return result -> {
             if (!result.isOK()) {
-                if (result.getException()
-                        .getClass()
-                        .getName()
-                        .equals("io.netty.channel.StacklessClosedChannelException")) {
-                    // client closed the websocket channel uncleanly and bifrost server wasn't aware of it. Not a big
-                    // deal in the grand scheme of things
-                    logger.debug("Couldn't send log line since client closed channel:", result.getException());
-                } else {
-                    logger.error("Error sending log line.", result.getException());
-                }
+                logger.error("Error sending log line.", result.getException());
                 unsubscribeSession(session.getId());
             }
         };
