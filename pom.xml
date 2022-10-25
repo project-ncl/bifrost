@@ -45,7 +45,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
-    <version.elasticSearch>5.6.15</version.elasticSearch>
+    <version.elasticSearch>7.17.7</version.elasticSearch>
     <quarkus.package.type>uber-jar</quarkus.package.type>
     <elasticsearch.maven.plugin.version>6.23</elasticsearch.maven.plugin.version>
     <excludeTags>debug-test</excludeTags>
