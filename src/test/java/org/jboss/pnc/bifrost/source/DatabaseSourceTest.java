@@ -169,4 +169,28 @@ public class DatabaseSourceTest {
         Assertions.assertArrayEquals(lines.toArray(), sorted.toArray());
     }
 
+    @Test
+    public void shouldGetLinesAfterTimeStamp() throws Exception {
+        OffsetDateTime time0 = OffsetDateTime.now();
+        logger.info("Time0: {}.", time0);
+        OffsetDateTime time1 = time0.plusMinutes(5);
+        dbUtils.insertLines(1, 1, DEFAULT_LOGGER, time0);
+        dbUtils.insertLines(1, 1, DEFAULT_LOGGER, time1);
+        dbUtils.insertLines(1, 1, DEFAULT_LOGGER, time0.plusMinutes(10));
+        dbUtils.insertLines(1, 1, DEFAULT_LOGGER, time0.plusMinutes(15));
+        dbUtils.insertLines(1, 1, DEFAULT_LOGGER, time0.plusMinutes(20));
+
+        List<Line> lines = new ArrayList<>();
+        Consumer<Line> onLine = (line -> {
+            logger.info("Found line: " + line);
+            lines.add(line);
+        });
+
+        Map<String, List<String>> noFilters = Collections.emptyMap();
+
+        Line searchAfter = Line.newBuilder().timestamp(time1.toString()).build();
+        databaseSource.get(noFilters, noFilters, Optional.of(searchAfter), Direction.ASC, 100, onLine);
+        Assertions.assertEquals(4, lines.size());
+    }
+
 }

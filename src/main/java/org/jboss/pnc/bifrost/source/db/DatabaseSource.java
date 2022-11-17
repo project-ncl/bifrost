@@ -239,8 +239,16 @@ public class DatabaseSource implements Source {
             }
 
             parameters.and("afterTimestamp", OffsetDateTime.parse(afterLine.getTimestamp()));
-            parameters.and("afterSequence", Integer.parseInt(afterLine.getSequence()));
-            parameters.and("afterId", Long.parseLong(afterLine.getId()));
+            if (afterLine.getSequence() != null) {
+                parameters.and("afterSequence", Integer.parseInt(afterLine.getSequence()));
+            } else {
+                parameters.and("afterSequence", 0);
+            }
+            if (afterLine.getId() != null) {
+                parameters.and("afterId", Long.parseLong(afterLine.getId()));
+            } else {
+                parameters.and("afterId", 0L);
+            }
         });
 
         String query = andQueryParts.stream().collect(Collectors.joining(" and "));

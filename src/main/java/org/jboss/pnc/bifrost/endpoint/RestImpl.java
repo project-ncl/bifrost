@@ -98,11 +98,11 @@ public class RestImpl implements Bifrost {
 
         validateAndFixInputDate(afterLine);
 
-        ArrayBlockingQueue<Optional<Line>> queue = new ArrayBlockingQueue(1024); // TODO
+        ArrayBlockingQueue<Optional<Line>> queue = new ArrayBlockingQueue(1024);
 
         Runnable addEndOfDataMarker = () -> {
             try {
-                queue.offer(Optional.empty(), 5, TimeUnit.SECONDS); // TODO
+                queue.offer(Optional.empty(), 5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 errCounter.increment();
                 logger.error("Cannot add end of data marker.", e);
