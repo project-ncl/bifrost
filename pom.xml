@@ -47,7 +47,7 @@
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
     <version.elasticSearch>5.6.15</version.elasticSearch>
     <quarkus.package.type>uber-jar</quarkus.package.type>
-    <elasticsearch.maven.plugin.version>6.23</elasticsearch.maven.plugin.version>
+    <elasticsearch.maven.plugin.version>6.26</elasticsearch.maven.plugin.version>
     <excludeTags>debug-test</excludeTags>
     <tagSuffix />
   </properties>
