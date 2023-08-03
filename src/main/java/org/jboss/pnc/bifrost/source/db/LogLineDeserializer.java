@@ -60,7 +60,7 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
             throws IOException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        int sequence = Json.<Integer> getNumber(node, "/sequence").orElse(0);
+        long sequence = getLong(node, "/sequence").orElse(0L);
 
         String time = Json.getText(node, "/@timestamp").or(() -> Json.getText(node, "/timestamp")).orElseGet(() -> {
             logger.warn("Missing timestamp in input message, setting it now.");
@@ -104,5 +104,20 @@ public class LogLineDeserializer extends StdDeserializer<LogLine> {
                 LogLevel.parse(level),
                 loggerName,
                 logLine);
+    }
+
+    public static Optional<Long> getLong(JsonNode node, String path) {
+        JsonNode jsonNode = node.at(path);
+        if (jsonNode.isMissingNode()) {
+            return Optional.empty();
+        } else {
+            if (jsonNode.isNumber()) {
+                return Optional.of(jsonNode.longValue());
+            } else {
+                // number is probably quoted
+                String value = jsonNode.textValue();
+                return Optional.of(Long.valueOf(value));
+            }
+        }
     }
 }

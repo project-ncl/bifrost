@@ -31,10 +31,6 @@ import org.jboss.pnc.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.context.control.ActivateRequestContext;
-import javax.inject.Inject;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -47,6 +43,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.context.control.ActivateRequestContext;
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -170,7 +170,7 @@ public class DatabaseSource implements Source {
         return Line.newBuilder()
                 .id(Long.toString(row.getId()))
                 .timestamp(DATE_TIME_FORMATTER.format(row.getEventTimestamp()))
-                .sequence(Integer.toString(row.getSequence()))
+                .sequence(Long.toString(row.getSequence()))
                 .logger(row.getLoggerName())
                 .message(row.getLine())
                 .last(last)
@@ -241,7 +241,7 @@ public class DatabaseSource implements Source {
 
             parameters.and("afterTimestamp", OffsetDateTime.parse(afterLine.getTimestamp()));
             if (afterLine.getSequence() != null) {
-                parameters.and("afterSequence", Integer.parseInt(afterLine.getSequence()));
+                parameters.and("afterSequence", Long.parseLong(afterLine.getSequence()));
             } else {
                 parameters.and("afterSequence", 0);
             }

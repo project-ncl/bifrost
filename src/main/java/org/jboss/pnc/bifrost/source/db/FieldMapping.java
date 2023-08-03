@@ -22,14 +22,14 @@ import org.jboss.pnc.bifrost.source.db.converter.IntegerConverter;
 import org.jboss.pnc.bifrost.source.db.converter.LogLevelConverter;
 import org.jboss.pnc.bifrost.source.db.converter.LongConverter;
 import org.jboss.pnc.bifrost.source.db.converter.OffsetDateTimeConverter;
-import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 import org.jboss.pnc.bifrost.source.db.converter.StringConverter;
 import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
+import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 import org.jboss.pnc.common.Strings;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.Optional;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -55,7 +55,7 @@ public class FieldMapping {
         this.mappings = Map.ofEntries(
                 Map.entry("id", Field.from(LogLine.class, "id", longConverter, true)),
                 Map.entry("timestamp", Field.from(LogLine.class, "eventTimestamp", offsetDateTimeConverter, true)),
-                Map.entry("sequence", Field.from(LogLine.class, "sequence", integerConverter, true)),
+                Map.entry("sequence", Field.from(LogLine.class, "sequence", longConverter, true)),
                 Map.entry("loggerName", Field.from(LogLine.class, "loggerName", stringConverter, false)),
                 Map.entry("loggerName.keyword", Field.from(LogLine.class, "loggerName", stringConverter, false)),
                 Map.entry("level", Field.from(LogLine.class, "level", logLevelConverter, true)),

@@ -27,6 +27,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Type;
 
+import java.time.OffsetDateTime;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,7 +36,6 @@ import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.OffsetDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -62,7 +62,7 @@ public class LogLine extends PanacheEntityBase {
 
     OffsetDateTime eventTimestamp;
 
-    int sequence;
+    long sequence;
 
     @Column(name = "level_id")
     LogLevel level;
