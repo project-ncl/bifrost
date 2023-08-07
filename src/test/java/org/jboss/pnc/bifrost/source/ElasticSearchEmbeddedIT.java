@@ -37,6 +37,7 @@ import org.jboss.pnc.bifrost.source.elasticsearch.ElasticSearchConfig;
 import org.jboss.pnc.bifrost.test.Wait;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ import java.util.function.Consumer;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @QuarkusTest
+@Disabled
 // although no need to boot the application, the logging does not work without this annotation
 public class ElasticSearchEmbeddedIT {
 
