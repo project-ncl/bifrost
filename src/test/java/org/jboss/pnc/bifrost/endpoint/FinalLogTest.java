@@ -86,6 +86,7 @@ public class FinalLogTest {
 
     private static FinalLog createFinalLog(String text, LogEntry logEntry, String loggerName, String tag) {
         FinalLog finalLog = new FinalLog();
+        finalLog.id = Sequence.nextId();
         finalLog.logContent = BlobProxy.generateProxy(text.getBytes(StandardCharsets.UTF_8));
         finalLog.logEntry = logEntry;
         finalLog.eventTimestamp = OffsetDateTime.now();

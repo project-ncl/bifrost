@@ -17,12 +17,13 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import java.io.IOException;
@@ -36,7 +37,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-public class FinalLog extends PanacheEntity {
+public class FinalLog extends PanacheEntityBase {
+
+    @Id
+    public long id;
 
     @ManyToOne(optional = false)
     public LogEntry logEntry;
