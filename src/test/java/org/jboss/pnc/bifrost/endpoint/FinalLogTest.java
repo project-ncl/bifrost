@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @QuarkusTest
 public class FinalLogTest {
@@ -73,12 +74,81 @@ public class FinalLogTest {
         Assertions.assertEquals("hello 2", logLineSecond);
     }
 
+    @Test
+    @Transactional
+    void testDeleteAll() throws Exception {
+        long processContext = 1323124L;
+        LogEntry logEntry = createLogEntry(processContext, "0");
+
+        FinalLog firstLog = createFinalLog("hello", logEntry, "a", "build");
+        FinalLog secondLog = createFinalLog("hello 2", logEntry, "b", "build");
+        FinalLog thirdLog = createFinalLog("hello 3", logEntry, "c", "alignment");
+
+        long deleted = FinalLog.deleteByProcessContext(processContext, null, false);
+
+        Assertions.assertEquals(deleted, 3);
+    }
+
+    @Test
+    @Transactional
+    void testDeleteTag() throws Exception {
+        long processContext = 1323125L;
+        LogEntry logEntry = createLogEntry(processContext, "0");
+
+        FinalLog firstLog = createFinalLog("hello", logEntry, "a", "build");
+        FinalLog secondLog = createFinalLog("hello 2", logEntry, "b", "build");
+        FinalLog thirdLog = createFinalLog("hello 3", logEntry, "c", "alignment");
+
+        long deleted = FinalLog.deleteByProcessContext(processContext, "build", false);
+
+        Assertions.assertEquals(deleted, 2);
+    }
+
+    @Test
+    @Transactional
+    void shouldNotDeletePersistent() throws Exception {
+        long processContext = 1323126L;
+        LogEntry logEntry = createLogEntry(processContext, "0");
+
+        FinalLog firstLog = createFinalLog("hello", logEntry, "a", "build");
+        FinalLog secondLog = createFinalLog("hello 2", logEntry, "b", "build");
+        FinalLog thirdLog = createFinalLog("hello 3", logEntry, "c", "alignment");
+
+        long deleted = FinalLog.deleteByProcessContext(processContext, null, true);
+
+        Assertions.assertEquals(deleted, 0);
+    }
+
+    @Test
+    @Transactional
+    void shouldDeleteTemporary() throws Exception {
+        long processContext = 1323127L;
+        LogEntry logEntry = createLogEntry(processContext, "0", true);
+        LogEntry logEntry2 = createLogEntry(processContext, "0", false);
+
+        FinalLog firstLog = createFinalLog("hello", logEntry, "a", "build");
+        FinalLog secondLog = createFinalLog("hello 2", logEntry, "b", "build");
+        FinalLog thirdLog = createFinalLog("hello 3", logEntry, "c", "alignment");
+
+        FinalLog firstLog2 = createFinalLog("hello", logEntry2, "a", "build");
+        FinalLog secondLog2 = createFinalLog("hello 2", logEntry2, "b", "build");
+        FinalLog thirdLog2 = createFinalLog("hello 3", logEntry2, "c", "alignment");
+
+        long deleted = FinalLog.deleteByProcessContext(processContext, null, true);
+
+        Assertions.assertEquals(deleted, 3);
+    }
+
     private static LogEntry createLogEntry(long processContext, String processContextVariant) {
+        return createLogEntry(processContext, processContextVariant, false);
+    }
+
+    private static LogEntry createLogEntry(long processContext, String processContextVariant, boolean temporary) {
         LogEntry logEntry = new LogEntry();
         logEntry.setId(Sequence.nextId());
         logEntry.setProcessContext(processContext);
         logEntry.setProcessContextVariant(processContextVariant);
-
+        logEntry.setTemporary(temporary);
         logEntry.persist();
 
         return logEntry;
@@ -91,7 +161,7 @@ public class FinalLogTest {
         finalLog.eventTimestamp = OffsetDateTime.now();
         finalLog.loggerName = loggerName;
         finalLog.md5sum = "a";
-        finalLog.tags = List.of(tag);
+        finalLog.tags = Set.of(tag);
 
         finalLog.persist();
 

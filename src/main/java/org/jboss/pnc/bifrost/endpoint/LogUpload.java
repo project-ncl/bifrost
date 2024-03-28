@@ -17,8 +17,12 @@
  */
 package org.jboss.pnc.bifrost.endpoint;
 
+import com.sun.jdi.ThreadReference;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.configuration.MemorySize;
+import io.quarkus.security.Authenticated;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.jboss.pnc.api.constants.MDCHeaderKeys;
@@ -31,22 +35,31 @@ import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
 import org.jboss.pnc.bifrost.source.db.converter.idConverter;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
+import javax.validation.constraints.NotBlank;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
-@Path("/upload")
+@Path("/final-log")
 @PermitAll
+@Slf4j
 public class LogUpload {
     @ConfigProperty(name = "quarkus.http.limits.max-body-size")
     MemorySize maxPostValue;
@@ -56,7 +69,7 @@ public class LogUpload {
 
     private final ValueConverter<Long> idConverter = new idConverter();
 
-    @Path("/final-log")
+    @Path("/upload")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -71,7 +84,7 @@ public class LogUpload {
         finalLog.md5sum = logUpload.getMd5sum();
 
         if (logUpload.getTag() != null) {
-            finalLog.tags = Arrays.asList(logUpload.getTag().split(","));
+            finalLog.tags = Set.of(logUpload.getTag().split(","));
         }
 
         ChecksumValidatingStream stream = ChecksumValidatingStream
@@ -91,6 +104,34 @@ public class LogUpload {
         finalLog.size = stream.readSize();
 
         return "ok";
+    }
+
+    @Path("/{processContext}/delete")
+    @DELETE
+    @RolesAllowed("**") // FIXME change to specific allowed roles
+    public Response deleteFinalLog(@PathParam("processContext") String processContext) {
+        // parse process context
+        long processContextLong;
+        if (processContext.startsWith("build-")) {
+            processContextLong = idConverter.convert(processContext);
+        } else {
+            try {
+                processContextLong = Long.parseLong(processContext);
+            } catch (NumberFormatException e) {
+                throw new BadRequestException(
+                        "Process context " + processContext + "is not a number nor a Build process.");
+            }
+        }
+        List<LogEntry> logEntries = LogEntry.list("processContext", processContextLong);
+        if (logEntries.stream().noneMatch(LogEntry::getTemporary)) {
+            throw new BadRequestException("Can't delete logs of persistent entries.");
+        }
+
+        log.debug("Deleting final logs with processContext: {} (long -> {})", processContext, processContextLong);
+        long deleted = FinalLog.deleteByProcessContext(processContextLong, null, true);
+        log.debug("Deleted {} rows with processContext {} (long -> {}).", deleted, processContext, processContextLong);
+
+        return Response.noContent().build();
     }
 
     private LogEntry getLogEntry(HttpHeaders headers) {

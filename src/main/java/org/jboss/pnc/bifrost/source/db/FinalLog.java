@@ -18,13 +18,18 @@
 package org.jboss.pnc.bifrost.source.db;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -33,6 +38,7 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -51,7 +57,9 @@ public class FinalLog extends PanacheEntity {
     public String md5sum;
 
     @ElementCollection
-    public List<String> tags;
+    @OnDelete(action = OnDeleteAction.CASCADE) // TODO remove with JoinColumn on Hibernate version 6+ (ticket: HHH-5529)
+    @JoinColumn(name = "finallog_id")
+    public Set<String> tags;
 
     @Lob
     public Blob logContent;
@@ -95,5 +103,26 @@ public class FinalLog extends PanacheEntity {
             logMap.put(finalLog.loggerName, finalLog);
         }
         return logMap.values();
+    }
+
+    public static long deleteByProcessContext(long processContext, String tag, boolean temporaryOnly) {
+        // language=HQL
+        String logEntryQuery = "select id from LogEntry where processContext = :processContext";
+        Parameters parameters = Parameters.with("processContext", processContext);
+        if (temporaryOnly) {
+            logEntryQuery += " and temporary = :temporary";
+            parameters.and("temporary", true);
+        }
+
+        // unfortunately JPA/HQL DELETE queries do not support Joins in FROM clause, so we have fallback to subquery
+        // in WHERE clause
+        // language=HQL
+        String query = "from FinalLog where logEntry.id in (" + logEntryQuery + ")";
+        if (tag != null) {
+            query += " and :tag in elements(tags)";
+            parameters.and("tag", tag);
+        }
+
+        return delete(query, parameters);
     }
 }
