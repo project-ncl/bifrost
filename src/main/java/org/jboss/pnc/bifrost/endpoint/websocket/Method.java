@@ -19,7 +19,7 @@ package org.jboss.pnc.bifrost.endpoint.websocket;
 
 import org.jboss.pnc.api.bifrost.dto.Line;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 import java.util.function.Consumer;
 
 /**

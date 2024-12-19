@@ -17,9 +17,9 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 import java.util.Optional;
 
 @ApplicationScoped

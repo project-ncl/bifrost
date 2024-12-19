@@ -20,7 +20,7 @@ package org.jboss.pnc.bifrost.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;

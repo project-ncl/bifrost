@@ -37,8 +37,7 @@
   <properties>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.16.12.Final</quarkus.platform.version>
-    <quarkus.package.type>uber-jar</quarkus.package.type>
+    <quarkus.platform.version>3.17.4</quarkus.platform.version>
     <compiler-plugin.version>3.13.0</compiler-plugin.version>
     <failsafe.useModulePath>false</failsafe.useModulePath>
     <maven.compiler.release>17</maven.compiler.release>
@@ -46,10 +45,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <surefire-plugin.version>3.5.0</surefire-plugin.version>
     <version.elasticSearch>5.6.15</version.elasticSearch>
-    <quarkus.package.type>uber-jar</quarkus.package.type>
+    <quarkus.package.jar.type>uber-jar</quarkus.package.jar.type>
     <elasticsearch.maven.plugin.version>6.23</elasticsearch.maven.plugin.version>
     <excludeTags>debug-test</excludeTags>
     <tagSuffix />
+    <quarkus.package.jar.type>uber-jar</quarkus.package.jar.type>
   </properties>
 
   <scm>
@@ -93,19 +93,11 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive</artifactId>
+      <artifactId>quarkus-rest-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
+      <artifactId>quarkus-messaging-kafka</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -146,12 +138,20 @@
     <dependency>
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-api</artifactId>
-      <version>3.0.0</version>
+      <classifier>jakarta</classifier>
+      <version>3.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-common</artifactId>
+      <classifier>jakarta</classifier>
       <version>3.0.1</version>
+      <exclusions>
+        <exclusion>  <!-- don't pull in regular pnc-api, we need the jakarta one -->
+          <groupId>org.jboss.pnc</groupId>
+          <artifactId>pnc-api</artifactId>
+        </exclusion>
+      </exclusions> 
     </dependency>
     <dependency>
       <groupId>com.thetransactioncompany</groupId>
@@ -185,7 +185,7 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-rest-client-jackson</artifactId>
+      <artifactId>quarkus-resteasy-client-jackson</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -194,11 +194,7 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-opentelemetry-exporter-otlp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-context</artifactId>
+      <artifactId>quarkus-opentelemetry</artifactId>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.client</groupId>
@@ -273,9 +269,9 @@
           </execution>
         </executions>
         <configuration>
-          <systemProperties>
+          <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-          </systemProperties>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>

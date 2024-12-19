@@ -21,7 +21,7 @@ import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.function.Consumer;
 
 /**

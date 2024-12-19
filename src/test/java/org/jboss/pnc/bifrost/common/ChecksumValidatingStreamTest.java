@@ -2,8 +2,8 @@ package org.jboss.pnc.bifrost.common;
 
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ValidationException;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.validation.ValidationException;
+import jakarta.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;

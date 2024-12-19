@@ -24,6 +24,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
+import jakarta.annotation.PostConstruct;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.source.Source;
@@ -43,10 +44,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.context.control.ActivateRequestContext;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.control.ActivateRequestContext;
+import jakarta.inject.Inject;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -186,7 +186,6 @@ public class DatabaseSource implements Source {
         // noop - using managed datasource
     }
 
-    @Timed
     private QueryWithParameters getQueryWithParameters(
             Map<String, List<String>> matchFilters,
             Map<String, List<String>> prefixFilters,

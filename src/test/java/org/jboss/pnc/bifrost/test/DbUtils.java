@@ -23,9 +23,9 @@ import org.jboss.pnc.bifrost.source.db.LogLevel;
 import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.common.concurrent.Sequence;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 

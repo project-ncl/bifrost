@@ -17,11 +17,10 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import io.quarkus.arc.Priority;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
-import javax.transaction.Transactional;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.transaction.Transactional;
 
 import org.jboss.pnc.common.Strings;
 

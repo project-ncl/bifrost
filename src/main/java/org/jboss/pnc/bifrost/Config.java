@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

@@ -17,8 +17,8 @@
  */
 package org.jboss.pnc.bifrost.common;
 
-import javax.validation.ValidationException;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.validation.ValidationException;
+import jakarta.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;

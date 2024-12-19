@@ -61,12 +61,13 @@ quarkus:
   shutdown:
     timeout: 30
 
-  opentelemetry:
+  otel:
     enabled: true
-    tracer:
+    resource:
+      attributes: "sampler_ratio=0.05,service.name=bifrost"
+    traces:
       enabled: true
       # reflect sampling on collector
-      resource-attributes: "sampler_ratio=0.05,service.name=bifrost"
       sampler:
         ratio: 0.05
       exporter:

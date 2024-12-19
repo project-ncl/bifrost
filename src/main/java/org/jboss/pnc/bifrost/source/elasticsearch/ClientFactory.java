@@ -20,6 +20,7 @@ package org.jboss.pnc.bifrost.source.elasticsearch;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -30,8 +31,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;

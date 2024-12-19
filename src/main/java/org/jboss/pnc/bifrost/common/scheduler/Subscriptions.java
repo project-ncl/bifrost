@@ -21,16 +21,15 @@ import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.opentelemetry.context.Context;
-
+import jakarta.annotation.PostConstruct;
 import org.apache.lucene.util.NamedThreadFactory;
 import org.jboss.pnc.bifrost.Config;
 import org.jboss.pnc.bifrost.common.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;

@@ -9,7 +9,7 @@ import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;

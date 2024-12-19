@@ -6,7 +6,7 @@ import org.jboss.pnc.common.concurrent.Sequence;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 

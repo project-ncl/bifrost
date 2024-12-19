@@ -29,7 +29,7 @@ import org.jboss.pnc.common.Strings;
 
 import java.util.Map;
 import java.util.Optional;
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

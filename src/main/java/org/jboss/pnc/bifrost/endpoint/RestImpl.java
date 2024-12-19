@@ -20,8 +20,8 @@ package org.jboss.pnc.bifrost.endpoint;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.extension.annotations.WithSpan;
-
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.jboss.pnc.api.bifrost.dto.Line;
@@ -40,12 +40,11 @@ import org.jboss.pnc.common.security.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;

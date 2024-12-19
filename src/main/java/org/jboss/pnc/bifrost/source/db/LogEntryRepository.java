@@ -17,7 +17,7 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 public interface LogEntryRepository {
 

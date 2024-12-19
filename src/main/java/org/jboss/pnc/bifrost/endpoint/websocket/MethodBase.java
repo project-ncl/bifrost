@@ -17,7 +17,7 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

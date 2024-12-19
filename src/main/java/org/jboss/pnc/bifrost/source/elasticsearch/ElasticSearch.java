@@ -20,6 +20,7 @@ package org.jboss.pnc.bifrost.source.elasticsearch;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
@@ -38,9 +39,8 @@ import org.jboss.pnc.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -230,7 +230,6 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
         }
     }
 
-    @Timed
     private QueryBuilder getQueryBuilder(
             Map<String, List<String>> matchFilters,
             Map<String, List<String>> prefixFilters) {

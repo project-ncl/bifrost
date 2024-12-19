@@ -22,8 +22,8 @@ import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
 import org.jboss.pnc.bifrost.source.db.LogLevel;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 
 /**

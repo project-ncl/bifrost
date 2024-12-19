@@ -23,13 +23,12 @@ import io.quarkus.panache.common.Sort;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -61,7 +60,6 @@ public class FinalLog extends PanacheEntityBase {
 
     @ElementCollection
     @OnDelete(action = OnDeleteAction.CASCADE) // TODO remove with JoinColumn on Hibernate version 6+ (ticket: HHH-5529)
-    @JoinColumn(name = "finallog_id")
     public Set<String> tags;
 
     @Lob
