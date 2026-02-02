@@ -73,6 +73,11 @@ public class RestTest {
 
     @Test
     public void shouldGetLines() throws IOException {
+        dataProvider.clear();
+
+        List<Line> lines = LineProducer.getLines(5, "abc123");
+        dataProvider.addAllLines(lines);
+
         ResteasyWebTarget rtarget = (ResteasyWebTarget) target;
         Bifrost rest = rtarget.proxy(Bifrost.class);
 

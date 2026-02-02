@@ -105,7 +105,7 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
 
         if (subscribeDto.getTailLines() != null && subscribeDto.getTailLines() > 0) {
             try {
-                Optional<Line> lastTailLine = fetchTail(subscribeDto, matchFilters, prefixFilters, onLine);
+                Optional<Line> lastTailLine = fetchTail(subscribeDto, matchFilters, prefixFilters, onLine, afterLine);
 
                 if (lastTailLine.isPresent()) {
                     afterLine = lastTailLine;
@@ -144,17 +144,21 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
         }
     }
 
-    private Optional<Line> fetchTail(SubscribeDto dto, String matchFilters, String prefixFilters, Consumer<Line> onLine)
-            throws IOException {
+    private Optional<Line> fetchTail(
+            SubscribeDto dto,
+            String matchFilters,
+            String prefixFilters,
+            Consumer<Line> onLine,
+            Optional<Line> afterLine) throws IOException {
         List<Line> buffer = new ArrayList<>();
 
         dataProvider.get(
                 matchFilters,
                 prefixFilters,
-                Optional.empty(),
+                afterLine,
                 Direction.DESC,
+                Optional.empty(),
                 Optional.of(dto.getTailLines()),
-                Optional.ofNullable(dto.getBatchSize()),
                 buffer::add);
 
         if (buffer.isEmpty()) {

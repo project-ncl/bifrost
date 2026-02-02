@@ -54,6 +54,7 @@ import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -101,6 +102,7 @@ public class RestImpl implements Bifrost {
             Direction direction,
             Format format,
             Integer maxLines,
+            Integer tailLines,
             Integer batchSize,
             Integer batchDelay,
             boolean follow,
@@ -190,6 +192,7 @@ public class RestImpl implements Bifrost {
                 prefixFilters,
                 afterLine,
                 maxLines,
+                tailLines,
                 batchSize,
                 batchDelay,
                 follow,
@@ -218,13 +221,53 @@ public class RestImpl implements Bifrost {
             String prefixFilters,
             Line afterLine,
             Integer maxLines,
+            Integer tailLines,
             Integer batchSize,
             Integer batchDelay,
             boolean follow,
             ArrayBlockingQueue<Optional<Line>> queue,
             Runnable addEndOfDataMarker,
             Subscription subscription) {
+        final Reference<Line> effectiveAfterLine = new Reference<>(afterLine);
         int[] receivedLines = { 0 };
+
+        if (tailLines != null && tailLines > 0) {
+            List<Line> tailBuffer = new ArrayList<>();
+            try {
+                dataProvider.get(
+                        matchFilters,
+                        prefixFilters,
+                        Optional.empty(),
+                        Direction.DESC,
+                        Optional.empty(),
+                        Optional.of(tailLines),
+                        tailBuffer::add);
+
+                Collections.reverse(tailBuffer);
+
+                for (Line line : tailBuffer) {
+                    if (line != null) {
+                        boolean added = queue.offer(Optional.of(line), 5, TimeUnit.SECONDS);
+                        if (added) {
+                            receivedLines[0]++;
+                        } else {
+                            warnCounter.increment();
+                            logger.warn("Queue full while buffering tail lines.");
+                        }
+                    }
+                }
+
+                if (!tailBuffer.isEmpty()) {
+                    effectiveAfterLine.set(tailBuffer.get(tailBuffer.size() - 1));
+                    logger.debug(
+                            "Tail loaded. Subscription will start after line ID: " + effectiveAfterLine.get().getId());
+                }
+            } catch (Exception e) {
+                warnCounter.increment();
+                logger.error("Failed to fetch tail lines. Falling back to standard subscription.", e);
+            }
+        }
+
         Consumer<Line> onLine = line -> {
             try {
                 if (line != null) {
@@ -257,7 +300,7 @@ public class RestImpl implements Bifrost {
         dataProvider.subscribe(
                 matchFilters,
                 prefixFilters,
-                Optional.ofNullable(afterLine),
+                Optional.ofNullable(effectiveAfterLine.get()),
                 onLine,
                 subscription,
                 Optional.ofNullable(maxLines),
