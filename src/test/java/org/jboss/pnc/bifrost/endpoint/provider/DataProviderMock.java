@@ -22,10 +22,11 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.test.Mock;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
-import org.jboss.pnc.bifrost.mock.LineProducer;
 
 import jakarta.enterprise.context.ApplicationScoped;
+
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,12 @@ public class DataProviderMock extends DataProvider {
         if (throwOnCall.isPresent()) {
             throw throwOnCall.get();
         } else {
-            LineProducer.getLines(5, "abc123").forEach(line -> onLine.accept(line));
+            List<Line> resultLines = new LinkedList<>(this.lines);
+            if (direction == Direction.DESC) {
+                Collections.reverse(resultLines);
+            }
+            int limit = batchSize.orElse(resultLines.size());
+            resultLines.stream().limit(limit).forEach(onLine);
         }
     }
 
@@ -71,13 +77,18 @@ public class DataProviderMock extends DataProvider {
             @SpanAttribute(value = "fetchSize") int fetchSize,
             @SpanAttribute(value = "lastResult") Optional<Line> lastResult,
             @SpanAttribute(value = "onLine") Consumer<Line> onLine) throws IOException {
+        String lastTimestamp = lastResult.map(Line::getTimestamp).orElse(null);
 
-        for (int i = 0; i < fetchSize; i++) {
-            if (lines.isEmpty()) {
+        int sentCount = 0;
+        for (Line line : this.lines) {
+            if (sentCount >= fetchSize) {
                 break;
             }
-            Line line = lines.pop();
-            onLine.accept(line);
+
+            if (lastTimestamp == null || Long.parseLong(line.getTimestamp()) > Long.parseLong(lastTimestamp)) {
+                onLine.accept(line);
+                sentCount++;
+            }
         }
     }
 
@@ -89,6 +100,10 @@ public class DataProviderMock extends DataProvider {
         for (Line line : lines) {
             addLine(line);
         }
+    }
+
+    public void clear() {
+        this.lines.clear();
     }
 
     public void setThrowOnCall(IOException e) {

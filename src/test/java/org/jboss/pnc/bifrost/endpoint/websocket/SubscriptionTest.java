@@ -27,6 +27,7 @@ import org.jboss.pnc.bifrost.common.Json;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProviderMock;
 import org.jboss.pnc.bifrost.mock.LineProducer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 import org.slf4j.Logger;
@@ -66,8 +67,17 @@ public class SubscriptionTest {
     @TestHTTPResource("/socket")
     URI uri;
 
+    @BeforeEach
+    void setup() {
+        mockDataProvider.clear();
+        LINES.clear();
+    }
+
     @Test
     public void testWebsocketGetLines() throws Exception {
+        List<Line> lines = LineProducer.getLines(5, "some-ctx");
+        mockDataProvider.addAllLines(lines);
+
         try (Session session = ContainerProvider.getWebSocketContainer().connectToServer(Client.class, uri)) {
             connected.get(10, TimeUnit.SECONDS);
 
@@ -87,10 +97,10 @@ public class SubscriptionTest {
             int received = 0;
             while (received < 5) {
                 Line receivedLine = LINES.poll(10, TimeUnit.SECONDS);
-                logger.debug("Received line notification: " + receivedLine.getMessage());
                 if (receivedLine == null) {
                     break;
                 }
+                logger.debug("Received line notification: " + receivedLine.getMessage());
                 received++;
             }
             session.close();
@@ -182,6 +192,107 @@ public class SubscriptionTest {
             Assertions.assertEquals(10, received);
         }
         TimeUnit.MILLISECONDS.sleep(250); // wait clean for shutdown
+    }
+
+    public void testWebsocketSubscriptionWithTail() throws Exception {
+        List<Line> lines = LineProducer.getLines(10, "tail-ctx");
+        mockDataProvider.addAllLines(lines);
+
+        try (Session session = ContainerProvider.getWebSocketContainer().connectToServer(Client.class, uri)) {
+            connected.get(10, TimeUnit.SECONDS);
+
+            MethodSubscribe methodSubscribe = new MethodSubscribe();
+            SubscribeDto parameters = new SubscribeDto();
+            parameters.setMatchFilters("");
+            parameters.setPrefixFilters("");
+            parameters.setTailLines(3);
+
+            Map<String, Object> parameterMap = (Map) BeanUtils.describe(parameters);
+
+            JSONRPC2Request request = new JSONRPC2Request(methodSubscribe.getName(), parameterMap, Integer.valueOf(3));
+            session.getAsyncRemote().sendText(request.toJSONString());
+
+            Result result = RESULTS.poll(5, TimeUnit.SECONDS);
+            Assertions.assertInstanceOf(SubscribeResultDto.class, result);
+
+            Line line1 = LINES.poll(5, TimeUnit.SECONDS);
+            Assertions.assertNotNull(line1, "Should have received 1st tail line");
+            Assertions.assertTrue(
+                    line1.getMessage().contains("Message 7"),
+                    "1st line should be 'Message 7' but was " + line1.getMessage());
+
+            Line line2 = LINES.poll(5, TimeUnit.SECONDS);
+            Assertions.assertNotNull(line2, "Should have received 2nd tail line");
+            Assertions.assertTrue(
+                    line2.getMessage().contains("Message 8"),
+                    "2nd line should be 'Message 8' but was " + line2.getMessage());
+
+            Line line3 = LINES.poll(5, TimeUnit.SECONDS);
+            Assertions.assertNotNull(line3, "Should have received 3rd tail line");
+            Assertions.assertTrue(
+                    line3.getMessage().contains("Message 9"),
+                    "3rd line should be 'Message 9' but was " + line3.getMessage());
+        }
+    }
+
+    @Test
+    public void testWebsocketSubscriptionWithTailAndContinue() throws Exception {
+        List<Line> historyLines = LineProducer.getLines(10, "tail-ctx");
+        mockDataProvider.addAllLines(historyLines);
+
+        try (Session session = ContainerProvider.getWebSocketContainer().connectToServer(Client.class, uri)) {
+            connected.get(10, TimeUnit.SECONDS);
+
+            MethodSubscribe methodSubscribe = new MethodSubscribe();
+            SubscribeDto parameters = new SubscribeDto();
+            parameters.setMatchFilters("");
+            parameters.setPrefixFilters("");
+            parameters.setTailLines(3);
+
+            Map<String, Object> parameterMap = (Map) BeanUtils.describe(parameters);
+
+            JSONRPC2Request request = new JSONRPC2Request(
+                    methodSubscribe.getName(),
+                    parameterMap,
+                    Integer.valueOf(500));
+            session.getAsyncRemote().sendText(request.toJSONString());
+
+            Result result = RESULTS.poll(5, TimeUnit.SECONDS);
+            Assertions.assertInstanceOf(SubscribeResultDto.class, result);
+
+            // Check tail lines
+            for (int i = 7; i <= 9; i++) {
+                Line line = LINES.poll(5, TimeUnit.SECONDS);
+                Assertions.assertNotNull(line, "Timed out waiting for tail line " + i);
+                Assertions.assertTrue(
+                        line.getMessage().contains("Message " + i),
+                        "Expected 'Message " + i + "' but got " + line.getMessage());
+            }
+
+            // Ensure no old history (0-6) is leaking through
+            Line noise = LINES.poll(500, TimeUnit.MILLISECONDS);
+            Assertions.assertNull(
+                    noise,
+                    "Should not have received any more lines (history leakage): "
+                            + (noise != null ? noise.getMessage() : ""));
+
+            // Add new data (Live events)
+            List<Line> newLines = LineProducer.getLines(2, "tail-continue-ctx");
+            newLines.get(0).setMessage("Message 10");
+            newLines.get(1).setMessage("Message 11");
+            mockDataProvider.addAllLines(newLines);
+
+            // We should receive exactly the new lines
+            Line received10 = LINES.poll(5, TimeUnit.SECONDS);
+            Assertions.assertNotNull(received10, "Should have received live update (Message 10)");
+            Assertions.assertEquals("Message 10", received10.getMessage());
+            Assertions.assertTrue(received10.getMdc().get("processContext").contains("continue"));
+
+            Line received11 = LINES.poll(5, TimeUnit.SECONDS);
+            Assertions.assertNotNull(received11, "Should have received live update (Message 11)");
+            Assertions.assertEquals("Message 11", received11.getMessage());
+            Assertions.assertTrue(received11.getMdc().get("processContext").contains("continue"));
+        }
     }
 
     @ClientEndpoint

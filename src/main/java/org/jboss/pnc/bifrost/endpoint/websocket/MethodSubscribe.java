@@ -24,6 +24,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.slf4j.Logger;
@@ -32,7 +33,12 @@ import org.slf4j.LoggerFactory;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.websocket.SendHandler;
+
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -96,6 +102,20 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
         };
 
         Optional<Line> afterLine = Optional.ofNullable(subscribeDto.getAfterLine());
+
+        if (subscribeDto.getTailLines() != null && subscribeDto.getTailLines() > 0) {
+            try {
+                Optional<Line> lastTailLine = fetchTail(subscribeDto, matchFilters, prefixFilters, onLine, afterLine);
+
+                if (lastTailLine.isPresent()) {
+                    afterLine = lastTailLine;
+                }
+            } catch (IOException e) {
+                errCounter.increment();
+                logger.error("Failed to fetch tail lines.", e);
+            }
+        }
+
         dataProvider.subscribe(
                 matchFilters,
                 prefixFilters,
@@ -124,4 +144,31 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
         }
     }
 
+    private Optional<Line> fetchTail(
+            SubscribeDto dto,
+            String matchFilters,
+            String prefixFilters,
+            Consumer<Line> onLine,
+            Optional<Line> afterLine) throws IOException {
+        List<Line> buffer = new ArrayList<>();
+
+        dataProvider.get(
+                matchFilters,
+                prefixFilters,
+                afterLine,
+                Direction.DESC,
+                Optional.empty(),
+                Optional.of(dto.getTailLines()),
+                buffer::add);
+
+        if (buffer.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Collections.reverse(buffer);
+
+        buffer.forEach(onLine);
+
+        return Optional.of(buffer.get(buffer.size() - 1));
+    }
 }
