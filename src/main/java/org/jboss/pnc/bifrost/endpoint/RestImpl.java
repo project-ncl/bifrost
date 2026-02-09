@@ -239,7 +239,7 @@ public class RestImpl implements Bifrost {
                         prefixFilters,
                         Optional.empty(),
                         Direction.DESC,
-                        Optional.empty(),
+                        Optional.of(tailLines),
                         Optional.of(tailLines),
                         tailBuffer::add);
 
