@@ -157,7 +157,7 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
                 prefixFilters,
                 afterLine,
                 Direction.DESC,
-                Optional.empty(),
+                Optional.of(dto.getTailLines()),
                 Optional.of(dto.getTailLines()),
                 buffer::add);
 
