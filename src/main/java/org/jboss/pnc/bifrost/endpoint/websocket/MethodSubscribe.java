@@ -26,6 +26,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
+import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,9 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
 
     @Inject
     DataProvider dataProvider;
+
+    @Inject
+    Subscriptions subscriptions;
 
     @Inject
     MeterRegistry registry;
@@ -101,30 +105,42 @@ public class MethodSubscribe extends MethodBase implements Method<SubscribeDto> 
             }
         };
 
-        Optional<Line> afterLine = Optional.ofNullable(subscribeDto.getAfterLine());
-
-        if (subscribeDto.getTailLines() != null && subscribeDto.getTailLines() > 0) {
+        subscriptions.submit(() -> {
             try {
-                Optional<Line> lastTailLine = fetchTail(subscribeDto, matchFilters, prefixFilters, onLine, afterLine);
+                Optional<Line> afterLine = Optional.ofNullable(subscribeDto.getAfterLine());
 
-                if (lastTailLine.isPresent()) {
-                    afterLine = lastTailLine;
+                if (subscribeDto.getTailLines() != null && subscribeDto.getTailLines() > 0) {
+                    try {
+                        Optional<Line> lastTailLine = fetchTail(
+                                subscribeDto,
+                                matchFilters,
+                                prefixFilters,
+                                onLine,
+                                afterLine);
+
+                        if (lastTailLine.isPresent()) {
+                            afterLine = lastTailLine;
+                        }
+                    } catch (IOException e) {
+                        errCounter.increment();
+                        logger.error("Failed to fetch tail lines.", e);
+                    }
                 }
-            } catch (IOException e) {
-                errCounter.increment();
-                logger.error("Failed to fetch tail lines.", e);
-            }
-        }
 
-        dataProvider.subscribe(
-                matchFilters,
-                prefixFilters,
-                afterLine,
-                onLine,
-                subscription,
-                Optional.empty(),
-                Optional.ofNullable(subscribeDto.getBatchSize()),
-                Optional.ofNullable(subscribeDto.getBatchDelay()));
+                dataProvider.subscribe(
+                        matchFilters,
+                        prefixFilters,
+                        afterLine,
+                        onLine,
+                        subscription,
+                        Optional.empty(),
+                        Optional.ofNullable(subscribeDto.getBatchSize()),
+                        Optional.ofNullable(subscribeDto.getBatchDelay()));
+            } catch (Exception e) {
+                errCounter.increment();
+                logger.error("Error during subscription initialization.", e);
+            }
+        });
 
         return new SubscribeResultDto(subscription.getTopic());
     }
