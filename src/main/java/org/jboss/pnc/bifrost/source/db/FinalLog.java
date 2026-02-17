@@ -27,6 +27,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -39,6 +42,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class FinalLog extends PanacheEntityBase {
 
     @Id

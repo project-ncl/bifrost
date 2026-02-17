@@ -88,6 +88,12 @@ bifrost:
   defaultSourceFetchSize: 100
   sourcePollThreads: 4
 
+log:
+  cleanup:
+    batch-size: 10000
+    delete-after: P2M
+    logger-names: org.jboss.pnc._userlog_.build-log,org.jboss.pnc._userlog.alignment-log
+
 '%prod':
   datasource:
     db-kind: ${QUARKUS_DATASOURCE:postgresql}
@@ -137,6 +143,9 @@ bifrost:
     deny-filters:
       - logger-name-prefix: org.jboss.pnc.bpm.eventlogger.ProcessProgressLogger
     hostname: localhost-0
+  log:
+    cleanup:
+      logger-names: test.logger
 
 "%dev":
   quarkus:
