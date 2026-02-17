@@ -61,8 +61,8 @@ quarkus:
       attributes: "sampler_ratio=0.05,service.name=bifrost"
     exporter:
       otlp:
-        # Send telemetry data to an opentelemetry-collector
-        #endpoint: http://localhost:4317
+      # Send telemetry data to an opentelemetry-collector
+      #endpoint: http://localhost:4317
     traces:
       enabled: true
       # reflect sampling on collector
@@ -122,6 +122,8 @@ bifrost:
         strategy: drop-and-create
     devservices:
       enabled: true
+    scheduler:
+      enabled: false
   bifrost:
     sourceClass: org.jboss.pnc.bifrost.source.db.DatabaseSource
   kafka2db:
