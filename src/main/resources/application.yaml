@@ -69,6 +69,10 @@ quarkus:
       sampler:
         ratio: 0.05
 
+shedlock:
+  defaults:
+    lock-at-most-for: PT4H
+
 elasticsearch:
   hosts: https://host:443
   indexes: test-*
