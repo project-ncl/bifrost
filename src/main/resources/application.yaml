@@ -43,6 +43,9 @@ quarkus:
       artifact-id: elasticsearch
       group-id: org.elasticsearch
   http:
+    auth:
+      # required for LDAP: build-time property
+      basic: true
     host: localhost
     port: 8081
     # gzip replies (only active for resteasy reactive)
@@ -54,11 +57,6 @@ quarkus:
       origins: "/.*/"
   shutdown:
     timeout: 30
-
-  http:
-    auth:
-      # required for LDAP: build-time property
-      basic: true
 
   security:
     ldap:
