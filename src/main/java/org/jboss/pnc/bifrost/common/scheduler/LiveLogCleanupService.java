@@ -44,7 +44,7 @@ public class LiveLogCleanupService {
     @ConfigProperty(name = "log.cleanup.logger-names", defaultValue = "")
     List<String> loggerNames;
 
-    @Scheduled(cron = "0 0 12 ? * SUN")
+    @Scheduled(cron = "${bifrost.liveLogCleanupCron}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     @SchedulerLock(name = "liveLogCleanup", lockAtMostFor = "PT4H")
     public void cleanupLiveLogs() {
         OffsetDateTime thresholdDate = OffsetDateTime.now().minus(deleteAfter);
