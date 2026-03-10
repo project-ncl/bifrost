@@ -108,7 +108,7 @@ bifrost:
     timeOutMillis: 300000
   defaultSourceFetchSize: 100
   sourcePollThreads: 4
-
+  liveLogCleanupCron: "0 0 12 ? * SUN"
 log:
   cleanup:
     batch-size: 10000
