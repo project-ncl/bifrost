@@ -21,9 +21,11 @@ import io.quarkus.logging.Log;
 import io.quarkus.runtime.configuration.MemorySize;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
+import org.jboss.pnc.api.bifrost.dto.Checksums;
 import org.jboss.pnc.api.bifrost.rest.FinalLogRest;
 import org.jboss.pnc.api.constants.MDCHeaderKeys;
 import org.jboss.pnc.bifrost.common.ChecksumValidatingStream;
@@ -134,7 +136,7 @@ public class FinalLogImpl implements FinalLogRest {
     @Path("/{processContext}/delete")
     @DELETE
     @RolesAllowed({ "pnc-app-bifrost-final-log-delete", "pnc-users-admin" })
-    @Transactional // FIXME change to specific allowed roles
+    @Transactional
     public Response deleteFinalLog(@PathParam("processContext") String processContext) {
         // parse process context
         Long processContextLong = idConverter.convert(processContext);
@@ -202,6 +204,31 @@ public class FinalLogImpl implements FinalLogRest {
                 .stream()
                 .mapToLong(m -> m.size)
                 .sum();
+    }
+
+    @Override
+    @Transactional
+    public Checksums getFinalLogChecksums(String processContext, String tag) {
+        Long id = idConverter.convert(processContext);
+        // if context is not present, return status 404
+        if (!LogEntry.isPresent(id)) {
+            throw new NotFoundException();
+        }
+
+        // if logs are not present, return status 204
+        if (FinalLog.getFinalLogsWithoutPreviousRetries(id, tag).isEmpty()) {
+            return null;
+        }
+
+        Checksums checksums;
+        try {
+            checksums = FinalLog.getChecksums(id, tag);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        log.info("Calculated checksums for processContext: {} and tag: {}. {}", processContext, tag, checksums);
+
+        return checksums;
     }
 
     private LogEntry getLogEntry(HttpHeaders headers) {

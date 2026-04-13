@@ -27,11 +27,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.xml.bind.DatatypeConverter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jboss.pnc.api.bifrost.dto.Checksums;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -44,7 +50,10 @@ import java.util.stream.Collectors;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class FinalLog extends PanacheEntityBase {
+
+    public static final int BUFFER_SIZE = 65536;
 
     @Id
     public long id;
@@ -129,5 +138,41 @@ public class FinalLog extends PanacheEntityBase {
         List<FinalLog> toDelete = list(query, parameters);
         toDelete.forEach(PanacheEntityBase::delete);
         return toDelete.size();
+    }
+
+    public static Checksums getChecksums(long processContext, String tag) throws SQLException, IOException {
+        Collection<FinalLog> logs = getFinalLogsWithoutPreviousRetries(processContext, tag);
+
+        MessageDigest md5 = getMessageDigest("MD5");
+        MessageDigest sha1 = getMessageDigest("SHA-1");
+        MessageDigest sha256 = getMessageDigest("SHA-256");
+        MessageDigest sha512 = getMessageDigest("SHA-512");
+        byte[] buffer = new byte[BUFFER_SIZE];
+        for (var finalLog : logs) {
+            // chain digest input streams so that all checksums are calculated at the same time
+            DigestInputStream md5Stream = new DigestInputStream(finalLog.logContent.getBinaryStream(), md5);
+            DigestInputStream sha1Stream = new DigestInputStream(md5Stream, sha1);
+            DigestInputStream sha256Stream = new DigestInputStream(sha1Stream, sha256);
+            DigestInputStream sha512Stream = new DigestInputStream(sha256Stream, sha512);
+            while (sha512Stream.read(buffer) != -1) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Read {} bytes of {}", BUFFER_SIZE, finalLog.id);
+                }
+            }
+
+        }
+        return new Checksums(
+                DatatypeConverter.printHexBinary(md5.digest()).toLowerCase(),
+                DatatypeConverter.printHexBinary(sha1.digest()).toLowerCase(),
+                DatatypeConverter.printHexBinary(sha256.digest()).toLowerCase(),
+                DatatypeConverter.printHexBinary(sha512.digest()).toLowerCase());
+    }
+
+    private static MessageDigest getMessageDigest(String algorithm) {
+        try {
+            return MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
