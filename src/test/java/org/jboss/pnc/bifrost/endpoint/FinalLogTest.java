@@ -1,7 +1,9 @@
 package org.jboss.pnc.bifrost.endpoint;
 
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.xml.bind.DatatypeConverter;
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
+import org.jboss.pnc.api.bifrost.dto.Checksums;
 import org.jboss.pnc.bifrost.source.db.FinalLog;
 import org.jboss.pnc.bifrost.source.db.LogEntry;
 import org.jboss.pnc.common.concurrent.Sequence;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Set;
@@ -132,6 +135,39 @@ public class FinalLogTest {
         long deleted = FinalLog.deleteByProcessContext(processContext, null, true);
 
         Assertions.assertEquals(3, deleted);
+    }
+
+    @Test
+    @Transactional
+    void shouldCalculateChecksum() throws Exception {
+        // with
+        long processContext = 1323128L;
+        LogEntry logEntry = createLogEntry(processContext, "0");
+
+        String text1 = "hello";
+        createFinalLog(text1, logEntry, "a", "build");
+
+        String text2 = "world";
+        createFinalLog(text2, logEntry, "b", "build");
+
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        MessageDigest sha512 = MessageDigest.getInstance("SHA-512");
+
+        var md5Digest = DatatypeConverter.printHexBinary(md5.digest((text1 + text2).getBytes())).toLowerCase();
+        var sha1Digest = DatatypeConverter.printHexBinary(sha1.digest((text1 + text2).getBytes())).toLowerCase();
+        var sha256Digest = DatatypeConverter.printHexBinary(sha256.digest((text1 + text2).getBytes())).toLowerCase();
+        var sha512Digest = DatatypeConverter.printHexBinary(sha512.digest((text1 + text2).getBytes())).toLowerCase();
+
+        // when
+        Checksums checksums = FinalLog.getChecksums(processContext, "build");
+
+        // then
+        Assertions.assertEquals(md5Digest, checksums.getMd5());
+        Assertions.assertEquals(sha1Digest, checksums.getSha1());
+        Assertions.assertEquals(sha256Digest, checksums.getSha256());
+        Assertions.assertEquals(sha512Digest, checksums.getSha512());
     }
 
     private static LogEntry createLogEntry(long processContext, String processContextVariant) {

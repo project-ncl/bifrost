@@ -71,10 +71,10 @@ quarkus:
         search-base-dn: ou=company.com
 
   oidc:
-      auth-server-url: https://keycloak-host/auth/realms/pncredhat
-      client-id: client
-      credentials:
-        secret: secret
+    auth-server-url: https://keycloak-host/auth/realms/pncredhat
+    client-id: client
+    credentials:
+      secret: secret
 
   otel:
     enabled: true
@@ -183,6 +183,12 @@ log:
     hibernate-orm:
       schema-management:
         strategy: drop-and-create
+    oidc:
+      auth-server-url: ""
+    http:
+      limits:
+        max-body-size: 2G
+        max-chunk-size: 1M
   kafka2db:
     accept-filters:
       - logger-name-prefix: org.jboss.pnc
