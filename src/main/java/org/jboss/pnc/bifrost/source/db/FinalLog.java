@@ -154,9 +154,11 @@ public class FinalLog extends PanacheEntityBase {
             DigestInputStream sha1Stream = new DigestInputStream(md5Stream, sha1);
             DigestInputStream sha256Stream = new DigestInputStream(sha1Stream, sha256);
             DigestInputStream sha512Stream = new DigestInputStream(sha256Stream, sha512);
-            while (sha512Stream.read(buffer) != -1) {
+
+            int read;
+            while ((read = sha512Stream.read(buffer)) != -1) {
                 if (log.isTraceEnabled()) {
-                    log.trace("Read {} bytes of {}", BUFFER_SIZE, finalLog.id);
+                    log.info("Read {} bytes of {}", read, finalLog.id);
                 }
             }
 
