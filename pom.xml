@@ -156,7 +156,7 @@
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-common</artifactId>
       <classifier>jakarta</classifier>
-      <version>3.4.0</version>
+      <version>3.4.1</version>
       <exclusions>
         <exclusion>  <!-- don't pull in regular pnc-api, we need the jakarta one -->
           <groupId>org.jboss.pnc</groupId>
