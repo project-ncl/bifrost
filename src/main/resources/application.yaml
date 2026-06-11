@@ -56,6 +56,7 @@ quarkus:
     enable-decompression: true
     cors:
       enabled: true
+      access-control-allow-credentials: true
       origins: "/.*/"
   shutdown:
     timeout: 30
