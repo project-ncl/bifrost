@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    uses: project-ncl/shared-github-actions/.github/workflows/maven-ci.yml@70502d0c707f7d7abb41b02af80fb094a022a760 # main
+    uses: project-ncl/shared-github-actions/.github/workflows/maven-ci.yml@c9741478ed178150f26bc7a7d44c5103f5995615 # main
     with:
       upload_artifacts: true
 
