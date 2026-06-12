@@ -83,7 +83,7 @@ quarkus:
     registry: quay.io
     group: rh-newcastle-devel
     name: bifrost
-    addtional-tags: latest
+    additional-tags: latest
   jib:
     jvm-entrypoint:
       - /usr/bin/bash
