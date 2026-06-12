@@ -48,7 +48,13 @@
     <elasticsearch.maven.plugin.version>6.23</elasticsearch.maven.plugin.version>
     <excludeTags>debug-test</excludeTags>
     <tagSuffix />
-    <quarkus.package.jar.type>uber-jar</quarkus.package.jar.type>
+    <!--
+       - we specify both version and digest so that dependabot updates
+       - both. The version is great for humans, the digest great for
+       - pinning the version properly
+      -->
+    <jib.base.image.version>1.24-7</jib.base.image.version>
+    <jib.base.image.digest>sha256:5ee73448f86838eecff13f80512b49ff6ea0fa21aaf5d1fa8afe3402fc965e9e</jib.base.image.digest>
   </properties>
 
   <scm>
@@ -143,6 +149,10 @@
       <artifactId>quarkus-scheduler</artifactId>
     </dependency>
     <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-container-image-jib</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-api</artifactId>
       <classifier>jakarta</classifier>
@@ -229,6 +239,11 @@
           <finalName>bifrost</finalName>
           <!-- needed to publish to maven central -->
           <skipOriginalJarRename>true</skipOriginalJarRename>
+          <systemProperties>
+              <quarkus.jib.base-jvm-image>
+                  registry.access.redhat.com/ubi10/openjdk-21-runtime:${jib.base.image.version}@${jib.base.image.digest}
+              </quarkus.jib.base-jvm-image>
+          </systemProperties>
         </configuration>
         <executions>
           <execution>

@@ -78,6 +78,16 @@ quarkus:
     client-id: client
     credentials:
       secret: secret
+# Jib / Container image
+  container-image:
+    registry: quay.io
+    group: rh-newcastle-devel
+    name: cleaner
+    addtional-tags: latest
+  jib:
+    jvm-entrypoint:
+      - /usr/bin/bash
+      - run-java.sh
 
 shedlock:
   defaults:

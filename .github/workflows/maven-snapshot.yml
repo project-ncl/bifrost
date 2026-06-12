@@ -8,9 +8,10 @@ on:
 
 jobs:
     call-snapshot-job:
-      uses: project-ncl/shared-github-actions/.github/workflows/maven-snapshot.yml@153b97777335953545bc8a907eb5f062af66b7f2 # v0.0.18
+      uses: project-ncl/shared-github-actions/.github/workflows/maven-snapshot.yml@c9741478ed178150f26bc7a7d44c5103f5995615 # main
       with:
         project_name: 'project-ncl/bifrost'
+        quarkus_jib_image: true
       secrets:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
