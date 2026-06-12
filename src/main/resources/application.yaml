@@ -48,7 +48,6 @@ quarkus:
     auth:
       # required for LDAP: build-time property
       basic: true
-    host: localhost
     port: 8081
     # gzip replies (only active for resteasy reactive)
     enable-compression: true
