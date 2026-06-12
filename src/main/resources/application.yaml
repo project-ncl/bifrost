@@ -88,6 +88,8 @@ quarkus:
     jvm-entrypoint:
       - /usr/bin/bash
       - run-java.sh
+    ports:
+    - 8081
 
 shedlock:
   defaults:
