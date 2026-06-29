@@ -23,7 +23,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -62,7 +63,6 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
     private static final String className = ElasticSearch.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ElasticSearch.class);
 
-    private RestClient lowLevelRestClient;
     private RestHighLevelClient client;
 
     private String[] indexes;
@@ -86,19 +86,21 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
     }
 
     private void init() {
+        this.indexes = elasticSearchConfig.getIndexes().split(",");
         try {
-            lowLevelRestClient = new ClientFactory(elasticSearchConfig).getConnectedClient();
+            RestClientBuilder builder = new ClientFactory(elasticSearchConfig).getConnectedClientBuilder();
+            client = new RestHighLevelClient(builder);
         } catch (Exception e) {
             logger.error("Cannot connect client.", e);
         }
-        this.indexes = elasticSearchConfig.getIndexes().split(",");
-        client = new RestHighLevelClient(lowLevelRestClient);
     }
 
     @Override
     public void close() {
         try {
-            lowLevelRestClient.close();
+            if (client != null) {
+                client.close();
+            }
         } catch (IOException e) {
             errCounter.increment();
             logger.error("Cannot close Elastisearch client.", e);
@@ -132,7 +134,7 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
                 .from(0)
                 .sort(new FieldSortBuilder("@timestamp").order(getSortOrder(direction)))
                 .sort(new FieldSortBuilder("sequence").order(getSortOrder(direction)))
-                .sort(new FieldSortBuilder("_uid").order(getSortOrder(direction)));
+                .sort(new FieldSortBuilder("_id").order(getSortOrder(direction)));
         if (searchAfter.isPresent()) {
             String timestamp = searchAfter.get().getTimestamp();
             TemporalAccessor accessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(timestamp);
@@ -153,10 +155,10 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
 
         SearchRequest searchRequest = new SearchRequest(indexes);
         searchRequest.source(sourceBuilder);
-        SearchResponse response = client.search(searchRequest);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 
         SearchHits responseHits = response.getHits();
-        logger.info("Total hits: {}, limited to {}.", responseHits.getTotalHits(), fetchSize);
+        logger.info("Total hits: {}, limited to {}.", responseHits.getTotalHits().value, fetchSize);
         int hitNum = 0;
 
         /**
@@ -196,11 +198,10 @@ public class ElasticSearch implements org.jboss.pnc.bifrost.source.Source {
     }
 
     private Line getLine(SearchHit hit, boolean last) {
-        Map<String, Object> source = hit.getSource();
+        Map<String, Object> source = hit.getSourceAsMap();
         logger.trace("Received line {}", source);
 
-        // String id = source.get("_type").toString() + "#" + source.get("_id").toString();
-        String id = hit.getType() + "#" + hit.getId();
+        String id = hit.getId();
         String timestamp = validateAndFixInputDate(getString(source, "@timestamp"));
         String sequence = getString(source, "sequence");
         String logger = getString(source, "loggerName");

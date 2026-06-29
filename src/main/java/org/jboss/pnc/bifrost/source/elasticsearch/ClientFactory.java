@@ -73,7 +73,7 @@ public class ClientFactory {
     }
 
     @Timed
-    public RestClient getConnectedClient() throws Exception {
+    public RestClientBuilder getConnectedClientBuilder() throws Exception {
         try {
             List<HttpHost> httpHosts = Arrays.stream(config.getHosts().split(","))
                     .map(h -> HttpHost.create(h))
@@ -102,12 +102,16 @@ public class ClientFactory {
                 });
             }
 
-            RestClient lowLevelRestClient = builder.build();
-            return lowLevelRestClient;
+            return builder;
         } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException
                 | CertificateException e) {
             errCounter.increment();
             throw new ClientConnectionException("Cannot connect to remote Elasticsearch server.", e);
         }
+    }
+
+    @Timed
+    public RestClient getConnectedClient() throws Exception {
+        return getConnectedClientBuilder().build();
     }
 }

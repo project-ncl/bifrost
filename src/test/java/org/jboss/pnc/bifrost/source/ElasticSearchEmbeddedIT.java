@@ -23,10 +23,12 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.xcontent.XContentType;
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.common.Json;
@@ -95,7 +97,9 @@ public class ElasticSearchEmbeddedIT {
         logger.info("Json create index: " + jsonString);
 
         HttpEntity entity = new NStringEntity(jsonString, ContentType.APPLICATION_JSON);
-        lowLevelRestClient.performRequest("PUT", "/test", Collections.emptyMap(), entity);
+        Request request = new Request("PUT", "/test");
+        request.setEntity(entity);
+        lowLevelRestClient.performRequest(request);
         lowLevelRestClient.close();
     }
 
@@ -107,11 +111,10 @@ public class ElasticSearchEmbeddedIT {
         byte[] jsonLine = Json.mapper().writeValueAsBytes(insertLine);
         logger.info("json line: " + new String(jsonLine));
 
-        RestClient restClient = clientFactory.getConnectedClient();
-        RestHighLevelClient client = new RestHighLevelClient(restClient);
-        IndexRequest indexRequest = new IndexRequest("test", "doc", "1");
+        RestHighLevelClient client = new RestHighLevelClient(clientFactory.getConnectedClientBuilder());
+        IndexRequest indexRequest = new IndexRequest("test").id("1");
         indexRequest.source(jsonLine, XContentType.JSON);
-        IndexResponse response = client.index(indexRequest);
+        IndexResponse response = client.index(indexRequest, RequestOptions.DEFAULT);
 
         logger.info("Response status: " + response.status());
         Assertions.assertEquals(RestStatus.CREATED, response.status());
@@ -131,7 +134,7 @@ public class ElasticSearchEmbeddedIT {
         elasticSearchSource.get(noFilters, noFilters, Optional.empty(), Direction.ASC, 10, onLine);
 
         Wait.forCondition(() -> receivedLine.get() != null, 10L, ChronoUnit.SECONDS);
-        restClient.close();
+        client.close();
     }
 
     @Test
@@ -172,14 +175,13 @@ public class ElasticSearchEmbeddedIT {
         List<Line> lines = LineProducer.getLines(numberOfLines, ctx, loggerName);
         for (Line line : lines) {
             byte[] jsonLine = Json.mapper().writeValueAsBytes(line);
-            RestClient restClient = clientFactory.getConnectedClient();
-            RestHighLevelClient client = new RestHighLevelClient(restClient);
-            IndexRequest indexRequest = new IndexRequest("test", "doc");
+            RestHighLevelClient client = new RestHighLevelClient(clientFactory.getConnectedClientBuilder());
+            IndexRequest indexRequest = new IndexRequest("test");
             indexRequest.source(jsonLine, XContentType.JSON);
-            IndexResponse response = client.index(indexRequest);
+            IndexResponse response = client.index(indexRequest, RequestOptions.DEFAULT);
 
             Assertions.assertEquals(RestStatus.CREATED, response.status());
-            restClient.close();
+            client.close();
         }
     }
 }

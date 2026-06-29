@@ -18,8 +18,7 @@
 package org.jboss.pnc.bifrost.source;
 
 import io.quarkus.test.junit.QuarkusTest;
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.BasicHttpEntity;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.jboss.pnc.api.bifrost.dto.Line;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -65,9 +63,8 @@ public class RemoteConnectionTest {
         logger.info("Connected.");
 
         String index = elasticSearchConfig.getIndexes().split(",")[0];
-        HttpEntity entity = new BasicHttpEntity();
-        Response response = lowLevelRestClient
-                .performRequest("GET", "/" + index + "/_search/", Collections.emptyMap(), entity);
+        Request request = new Request("GET", "/" + index + "/_search/");
+        Response response = lowLevelRestClient.performRequest(request);
         assert 200 == response.getStatusLine().getStatusCode();
         lowLevelRestClient.close();
     }
