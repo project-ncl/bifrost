@@ -23,8 +23,6 @@ quarkus:
     category:
       org.jboss.pnc:
         level: TRACE
-      org.elasticsearch:
-        level: INFO
       org.apache.http:
         level: INFO
     console:
@@ -40,10 +38,6 @@ quarkus:
       statement-batch-size: 100
     schema-management:
       strategy: validate
-  index-dependency:
-    elasticsearch:
-      artifact-id: elasticsearch
-      group-id: org.elasticsearch
   http:
     auth:
       # required for LDAP: build-time property
@@ -94,12 +88,6 @@ shedlock:
   defaults:
     lock-at-most-for: PT4H
 
-elasticsearch:
-  hosts: https://host:443
-  indexes: test-*
-  #keyStorePath =
-  #keyStorePass =
-  #keyPass =
 bifrost:
   backoffrunnable:
     delayMillis: 1000

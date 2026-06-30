@@ -22,7 +22,6 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.opentelemetry.context.Context;
 import jakarta.annotation.PostConstruct;
-import org.apache.lucene.util.NamedThreadFactory;
 import org.jboss.pnc.bifrost.Config;
 import org.jboss.pnc.bifrost.common.Reference;
 import org.slf4j.Logger;
@@ -38,7 +37,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -83,10 +84,14 @@ public class Subscriptions {
     public Subscriptions(Config config) {
         subscriptions = new ConcurrentHashMap<>();
         executor = Context.current()
-                .wrap(
-                        Executors.newScheduledThreadPool(
-                                config.getSourcePollThreads(),
-                                new NamedThreadFactory("subscriptions")));
+                .wrap(Executors.newScheduledThreadPool(config.getSourcePollThreads(), new ThreadFactory() {
+                    private final AtomicInteger counter = new AtomicInteger(1);
+
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        return new Thread(r, "subscriptions-" + counter.getAndIncrement());
+                    }
+                }));
     }
 
     public void submit(Runnable task) {

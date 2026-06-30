@@ -17,11 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-JAVA_OPTIONS="-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
--Delasticsearch.hosts= \
--Delasticsearch.indexes= \
--Delasticsearch.keyStorePath= \
--Delasticsearch.keyStorePass= \
--Delasticsearch.keyPass="
+JAVA_OPTIONS="-Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
 java ${JAVA_OPTIONS} -jar ./target/bifrost-server-0.1-SNAPSHOT-runner.jar
