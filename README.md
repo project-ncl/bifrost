@@ -1,4 +1,4 @@
-# Bifrost - Elasticsearch subscriptions service
+# Bifrost - Log subscriptions service
 
 ## Http GET
 **Json formatted log lines**

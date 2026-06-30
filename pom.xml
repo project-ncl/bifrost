@@ -23,7 +23,7 @@
   <version>3.5.1-SNAPSHOT</version>
 
   <name>bifrost</name>
-  <description>Elasticsearch subscriptions service</description>
+  <description>Log subscriptions service</description>
   <url>https://github.com/bifrost</url>
   <inceptionYear>2019</inceptionYear>
 
@@ -44,8 +44,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <surefire-plugin.version>3.5.6</surefire-plugin.version>
-    <version.elasticSearch>5.6.15</version.elasticSearch>
-    <elasticsearch.maven.plugin.version>6.23</elasticsearch.maven.plugin.version>
     <excludeTags>debug-test</excludeTags>
     <tagSuffix />
     <!--
@@ -79,11 +77,6 @@
         <version>${quarkus.platform.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.elasticsearch.client</groupId>
-        <artifactId>elasticsearch-rest-client</artifactId>
-        <version>${version.elasticSearch}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -198,17 +191,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-logging-json</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>elasticsearch-rest-high-level-client</artifactId>
-      <version>${version.elasticSearch}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

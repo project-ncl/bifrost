@@ -23,7 +23,6 @@ import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.api.bifrost.rest.Bifrost;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProviderMock;
 import org.jboss.pnc.bifrost.mock.LineProducer;
-import org.jboss.pnc.bifrost.source.RemoteConnectionTest;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ import java.util.concurrent.Semaphore;
 @QuarkusTest
 public class RestTest {
 
-    private static Logger logger = LoggerFactory.getLogger(RemoteConnectionTest.class);
+    private static Logger logger = LoggerFactory.getLogger(RestTest.class);
 
     private static WebTarget target;
 

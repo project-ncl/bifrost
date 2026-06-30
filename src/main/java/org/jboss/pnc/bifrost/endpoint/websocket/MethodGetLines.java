@@ -89,7 +89,7 @@ public class MethodGetLines extends MethodBase implements Method<GetLinesDto> {
                         onLine);
             } catch (Exception e) {
                 errCounter.increment();
-                logger.error("Unable to get data from Elasticsearch.", e);
+                logger.error("Unable to get data.", e);
             }
         });
         return new OkResult();
