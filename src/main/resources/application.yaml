@@ -101,7 +101,7 @@ log:
   cleanup:
     batch-size: 10000
     delete-after: P2M
-    logger-names: org.jboss.pnc._userlog_.build-log,org.jboss.pnc._userlog.alignment-log
+    logger-names: org.jboss.pnc._userlog_.build-log,org.jboss.pnc._userlog_.alignment-log
 
 '%prod':
   datasource:
