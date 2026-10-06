@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ServerErrorException;
@@ -55,6 +56,7 @@ import org.jboss.pnc.bifrost.common.Reference;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.common.scheduler.TimeoutExecutor;
 import org.jboss.pnc.bifrost.constants.BuildInformationConstants;
+import org.jboss.pnc.bifrost.constants.UserRoles;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.jboss.pnc.common.security.Md5;
 import org.slf4j.Logger;
@@ -69,6 +71,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @Path("/")
+@RolesAllowed({ UserRoles.USERS, UserRoles.USERS_ADMIN })
 public class RestImpl implements Bifrost {
     @ConfigProperty(name = "quarkus.application.name")
     String name;
