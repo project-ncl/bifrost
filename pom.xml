@@ -166,7 +166,7 @@
           <groupId>org.jboss.pnc</groupId>
           <artifactId>pnc-api</artifactId>
         </exclusion>
-      </exclusions> 
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.thetransactioncompany</groupId>
@@ -280,23 +280,41 @@
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
           <version>3.10.2</version>
-          <configuration>
-              <java>
-                  <removeUnusedImports />
-                  <eclipse>
-                      <file>eclipse-codeStyle.xml</file>
-                  </eclipse>
-                  <lineEndings>UNIX</lineEndings>
-              </java>
-          </configuration>
-          <executions>
-              <execution>
-                  <goals>
-                      <goal>apply</goal>
-                  </goals>
-                  <phase>compile</phase>
-              </execution>
-          </executions>
+        <configuration>
+          <pom>
+            <includes>
+              <include>pom.xml</include>
+            </includes>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+            </sortPom>
+          </pom>
+          <java>
+            <removeUnusedImports/>
+            <importOrder>
+              <file>java-import-order.txt</file>
+            </importOrder>
+            <eclipse>
+              <file>java-formatter.xml</file>
+            </eclipse>
+            <lineEndings>UNIX</lineEndings>
+          </java>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.pnc</groupId>
+            <artifactId>ide-config</artifactId>
+            <version>1.1.0</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>apply</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
