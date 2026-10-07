@@ -17,34 +17,6 @@
  */
 package org.jboss.pnc.bifrost.endpoint;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
-import jakarta.annotation.PostConstruct;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import org.jboss.pnc.api.bifrost.dto.Line;
-import org.jboss.pnc.api.bifrost.dto.MetaData;
-import org.jboss.pnc.api.bifrost.enums.Direction;
-import org.jboss.pnc.api.bifrost.enums.Format;
-import org.jboss.pnc.api.bifrost.rest.Bifrost;
-import org.jboss.pnc.api.dto.ComponentVersion;
-import org.jboss.pnc.bifrost.common.DateUtil;
-import org.jboss.pnc.bifrost.common.Reference;
-import org.jboss.pnc.bifrost.common.scheduler.Subscription;
-import org.jboss.pnc.bifrost.common.scheduler.TimeoutExecutor;
-import org.jboss.pnc.bifrost.constants.BuildInformationConstants;
-import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
-import org.jboss.pnc.common.security.Md5;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.ServerErrorException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -63,6 +35,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.dto.MetaData;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.api.bifrost.enums.Format;
+import org.jboss.pnc.api.bifrost.rest.Bifrost;
+import org.jboss.pnc.api.dto.ComponentVersion;
+import org.jboss.pnc.bifrost.common.DateUtil;
+import org.jboss.pnc.bifrost.common.Reference;
+import org.jboss.pnc.bifrost.common.scheduler.Subscription;
+import org.jboss.pnc.bifrost.common.scheduler.TimeoutExecutor;
+import org.jboss.pnc.bifrost.constants.BuildInformationConstants;
+import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
+import org.jboss.pnc.common.security.Md5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

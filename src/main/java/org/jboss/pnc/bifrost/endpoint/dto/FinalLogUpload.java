@@ -17,15 +17,16 @@
  */
 package org.jboss.pnc.bifrost.endpoint.dto;
 
-import lombok.Data;
+import java.time.OffsetDateTime;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
-import java.time.OffsetDateTime;
+import lombok.Data;
 
 @Data
 public class FinalLogUpload {

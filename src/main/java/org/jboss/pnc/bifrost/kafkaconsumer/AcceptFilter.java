@@ -17,10 +17,10 @@
  */
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
+import java.util.List;
+
 import org.jboss.pnc.bifrost.source.db.LogLevel;
 import org.jboss.pnc.bifrost.source.db.LogLine;
-
-import java.util.List;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

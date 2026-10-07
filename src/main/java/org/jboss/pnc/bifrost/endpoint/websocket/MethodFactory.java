@@ -17,10 +17,11 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import java.util.Optional;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import java.util.Optional;
 
 @ApplicationScoped
 public class MethodFactory {

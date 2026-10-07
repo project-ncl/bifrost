@@ -17,15 +17,17 @@
  */
 package org.jboss.pnc.bifrost.common.scheduler;
 
-import io.quarkus.narayana.jta.QuarkusTransaction;
-import io.quarkus.test.junit.QuarkusTest;
+import java.time.OffsetDateTime;
+
 import jakarta.inject.Inject;
+
 import org.jboss.pnc.bifrost.source.db.LogEntry;
 import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.OffsetDateTime;
+import io.quarkus.narayana.jta.QuarkusTransaction;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class LiveLogCleanupServiceTest {

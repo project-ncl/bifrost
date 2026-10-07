@@ -17,22 +17,6 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Parameters;
-import io.quarkus.panache.common.Sort;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.xml.bind.DatatypeConverter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jboss.pnc.api.bifrost.dto.Checksums;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
@@ -46,6 +30,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.xml.bind.DatatypeConverter;
+
+import org.jboss.pnc.api.bifrost.dto.Checksums;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @AllArgsConstructor

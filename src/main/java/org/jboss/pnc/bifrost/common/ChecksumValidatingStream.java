@@ -17,13 +17,14 @@
  */
 package org.jboss.pnc.bifrost.common;
 
-import jakarta.validation.ValidationException;
-import jakarta.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import jakarta.validation.ValidationException;
+import jakarta.xml.bind.DatatypeConverter;
 
 public class ChecksumValidatingStream extends InputStream {
 

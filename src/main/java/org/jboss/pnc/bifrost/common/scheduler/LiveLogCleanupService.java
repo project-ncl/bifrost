@@ -17,19 +17,20 @@
  */
 package org.jboss.pnc.bifrost.common.scheduler;
 
-import io.quarkus.panache.common.Page;
-import io.quarkus.scheduler.Scheduled;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-
-import net.javacrumbs.shedlock.cdi.SchedulerLock;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.pnc.bifrost.source.db.LogLine;
-
 import java.time.OffsetDateTime;
 import java.time.Period;
 import java.util.List;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.pnc.bifrost.source.db.LogLine;
+
+import io.quarkus.panache.common.Page;
+import io.quarkus.scheduler.Scheduled;
+import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.cdi.SchedulerLock;
 
 @ApplicationScoped
 @Slf4j

@@ -17,19 +17,20 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
+import java.util.Map;
+import java.util.Optional;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.jboss.pnc.bifrost.source.db.converter.BooleanConverter;
+import org.jboss.pnc.bifrost.source.db.converter.IdConverter;
 import org.jboss.pnc.bifrost.source.db.converter.IntegerConverter;
 import org.jboss.pnc.bifrost.source.db.converter.LogLevelConverter;
 import org.jboss.pnc.bifrost.source.db.converter.LongConverter;
 import org.jboss.pnc.bifrost.source.db.converter.OffsetDateTimeConverter;
 import org.jboss.pnc.bifrost.source.db.converter.StringConverter;
 import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
-import org.jboss.pnc.bifrost.source.db.converter.IdConverter;
 import org.jboss.pnc.common.Strings;
-
-import java.util.Map;
-import java.util.Optional;
-import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

@@ -1,7 +1,14 @@
 package org.jboss.pnc.bifrost.endpoint;
 
-import io.quarkus.test.junit.QuarkusTest;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.Set;
+
+import jakarta.transaction.Transactional;
 import jakarta.xml.bind.DatatypeConverter;
+
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.jboss.pnc.api.bifrost.dto.Checksums;
 import org.jboss.pnc.bifrost.source.db.FinalLog;
@@ -10,12 +17,7 @@ import org.jboss.pnc.common.concurrent.Sequence;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import jakarta.transaction.Transactional;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.Set;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class FinalLogTest {

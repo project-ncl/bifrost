@@ -17,8 +17,8 @@
  */
 package org.jboss.pnc.bifrost.source;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.Json;
 import org.jboss.pnc.bifrost.endpoint.websocket.Result;
@@ -29,7 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

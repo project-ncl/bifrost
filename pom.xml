@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ JBoss, Home of Professional Open Source.
   ~ Copyright 2020-2022 Red Hat, Inc., and individual contributors
@@ -38,10 +38,24 @@
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
-      <distribution>repo</distribution>
       <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <developers>
+    <developer>
+      <organization>RedHat</organization>
+      <organizationUrl>http://www.redhat.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:http://github.com/project-ncl/bifrost.git</connection>
+    <developerConnection>scm:git:git@github.com:project-ncl/bifrost.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>http://github.com/project-ncl/bifrost</url>
+  </scm>
   <properties>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
@@ -50,7 +64,7 @@
     <maven.compiler.release>17</maven.compiler.release>
     <jdk.min.version>17</jdk.min.version>
     <excludeTags>debug-test</excludeTags>
-    <tagSuffix />
+    <tagSuffix/>
     <!--
        - we specify both version and digest so that dependabot updates
        - both. The version is great for humans, the digest great for
@@ -59,20 +73,6 @@
     <jib.base.image.version>1.24-7</jib.base.image.version>
     <jib.base.image.digest>sha256:5ee73448f86838eecff13f80512b49ff6ea0fa21aaf5d1fa8afe3402fc965e9e</jib.base.image.digest>
   </properties>
-
-  <scm>
-    <connection>scm:git:http://github.com/project-ncl/bifrost.git</connection>
-    <developerConnection>scm:git:git@github.com:project-ncl/bifrost.git</developerConnection>
-    <url>http://github.com/project-ncl/bifrost</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <developers>
-    <developer>
-      <organization>RedHat</organization>
-      <organizationUrl>http://www.redhat.com</organizationUrl>
-    </developer>
-  </developers>
 
   <dependencyManagement>
     <dependencies>
@@ -147,22 +147,23 @@
       <artifactId>quarkus-scheduler</artifactId>
     </dependency>
     <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-container-image-jib</artifactId>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-container-image-jib</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-api</artifactId>
-      <classifier>jakarta</classifier>
       <version>3.5.2</version>
+      <classifier>jakarta</classifier>
     </dependency>
     <dependency>
       <groupId>org.jboss.pnc</groupId>
       <artifactId>pnc-common</artifactId>
-      <classifier>jakarta</classifier>
       <version>3.5.4</version>
+      <classifier>jakarta</classifier>
       <exclusions>
-        <exclusion>  <!-- don't pull in regular pnc-api, we need the jakarta one -->
+        <exclusion>
+          <!-- don't pull in regular pnc-api, we need the jakarta one -->
           <groupId>org.jboss.pnc</groupId>
           <artifactId>pnc-api</artifactId>
         </exclusion>
@@ -214,6 +215,19 @@
       <version>7.10.1</version>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>central-portal-snapshots</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
@@ -227,9 +241,7 @@
           <!-- needed to publish to maven central -->
           <skipOriginalJarRename>true</skipOriginalJarRename>
           <systemProperties>
-              <quarkus.jib.base-jvm-image>
-                  registry.access.redhat.com/ubi10/openjdk-21-runtime:${jib.base.image.version}@${jib.base.image.digest}
-              </quarkus.jib.base-jvm-image>
+            <quarkus.jib.base-jvm-image>registry.access.redhat.com/ubi10/openjdk-21-runtime:${jib.base.image.version}@${jib.base.image.digest}</quarkus.jib.base-jvm-image>
           </systemProperties>
         </configuration>
         <executions>
@@ -262,6 +274,11 @@
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+          </systemPropertyVariables>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -270,16 +287,11 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <systemPropertyVariables>
-            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-          </systemPropertyVariables>
-        </configuration>
       </plugin>
       <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>3.10.2</version>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>3.10.2</version>
         <configuration>
           <pom>
             <includes>
@@ -317,70 +329,70 @@
         </executions>
       </plugin>
       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-              <tagNameFormat>@{project.version}${tagSuffix}</tagNameFormat>
-              <autoVersionSubmodules>true</autoVersionSubmodules>
-              <releaseProfiles>central-release</releaseProfiles>
-              <goals>deploy</goals>
-          </configuration>
-       </plugin>
-       <plugin>
-           <groupId>pl.project13.maven</groupId>
-           <artifactId>git-commit-id-plugin</artifactId>
-           <version>4.9.10</version>
-           <executions>
-               <execution>
-                   <goals>
-                       <goal>revision</goal>
-                   </goals>
-               </execution>
-           </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>@{project.version}${tagSuffix}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <releaseProfiles>central-release</releaseProfiles>
+          <goals>deploy</goals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.9.10</version>
 
-           <configuration>
-               <!--
+        <configuration>
+          <!--
                  If you'd like to tell the plugin where your .git directory is,
                  use this setting, otherwise we'll perform a search trying to
                  figure out the right directory. It's better to add it explicite IMHO.
                -->
-               <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
 
-               <!-- false is default here, it prints some more information during the build -->
-               <verbose>true</verbose>
+          <!-- false is default here, it prints some more information during the build -->
+          <verbose>true</verbose>
 
-           </configuration>
-       </plugin>
-       <plugin>
-          <groupId>com.google.code.maven-replacer-plugin</groupId>
-          <artifactId>maven-replacer-plugin</artifactId>
-          <version>1.4.1</version>
-          <executions>
-              <execution>
-                  <phase>process-sources</phase>
-                  <goals>
-                      <goal>replace</goal>
-                  </goals>
-              </execution>
-          </executions>
-          <configuration>
-              <file>src/main/templates/org/jboss/pnc/bifrost/constants/BuildInformationConstants.java</file>
-              <outputFile>src/main/java/org/jboss/pnc/bifrost/constants/BuildInformationConstants.java</outputFile>
-              <replacements>
-                  <replacement>
-                      <token>@version@</token>
-                      <value>${project.version}</value>
-                  </replacement>
-                  <replacement>
-                      <token>@commit-id@</token>
-                      <value>${git.commit.id.abbrev}</value>
-                  </replacement>
-                  <replacement>
-                      <token>@build-time@</token>
-                      <value>${maven.build.timestamp}</value>
-                  </replacement>
-              </replacements>
-          </configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>maven-replacer-plugin</artifactId>
+        <version>1.4.1</version>
+        <configuration>
+          <file>src/main/templates/org/jboss/pnc/bifrost/constants/BuildInformationConstants.java</file>
+          <outputFile>src/main/java/org/jboss/pnc/bifrost/constants/BuildInformationConstants.java</outputFile>
+          <replacements>
+            <replacement>
+              <token>@version@</token>
+              <value>${project.version}</value>
+            </replacement>
+            <replacement>
+              <token>@commit-id@</token>
+              <value>${git.commit.id.abbrev}</value>
+            </replacement>
+            <replacement>
+              <token>@build-time@</token>
+              <value>${maven.build.timestamp}</value>
+            </replacement>
+          </replacements>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <phase>process-sources</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -432,17 +444,4 @@
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <name>Central Portal Snapshots</name>
-      <id>central-portal-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 </project>

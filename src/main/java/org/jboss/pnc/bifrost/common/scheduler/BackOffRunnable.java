@@ -17,12 +17,12 @@
  */
 package org.jboss.pnc.bifrost.common.scheduler;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.opentelemetry.context.Context;
-
-import java.util.Optional;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

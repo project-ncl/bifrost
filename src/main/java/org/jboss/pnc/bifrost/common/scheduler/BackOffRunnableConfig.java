@@ -17,11 +17,12 @@
  */
 package org.jboss.pnc.bifrost.common.scheduler;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

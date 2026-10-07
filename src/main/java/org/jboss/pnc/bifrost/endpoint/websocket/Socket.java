@@ -17,19 +17,11 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
-import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import jakarta.annotation.PostConstruct;
-import org.apache.commons.beanutils.BeanUtils;
-import org.jboss.pnc.api.bifrost.dto.Line;
-import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
+import java.util.function.Consumer;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
@@ -39,9 +31,20 @@ import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
-import java.util.function.Consumer;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
+
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

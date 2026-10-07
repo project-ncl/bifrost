@@ -17,12 +17,13 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import java.util.function.Consumer;
+
+import jakarta.inject.Inject;
+
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.bifrost.common.scheduler.Subscription;
 import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
-
-import jakarta.inject.Inject;
-import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

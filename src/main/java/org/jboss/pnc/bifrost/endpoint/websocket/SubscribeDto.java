@@ -17,9 +17,10 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
+import org.jboss.pnc.api.bifrost.dto.Line;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.jboss.pnc.api.bifrost.dto.Line;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

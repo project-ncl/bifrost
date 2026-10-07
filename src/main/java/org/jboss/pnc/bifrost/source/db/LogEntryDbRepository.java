@@ -17,14 +17,15 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import org.jboss.pnc.common.Strings;
-import org.jboss.pnc.common.concurrent.Sequence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.transaction.Transactional;
+
+import org.jboss.pnc.common.Strings;
+import org.jboss.pnc.common.concurrent.Sequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

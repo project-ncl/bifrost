@@ -17,12 +17,12 @@
  */
 package org.jboss.pnc.bifrost.mock;
 
-import org.jboss.pnc.api.bifrost.dto.Line;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
+import org.jboss.pnc.api.bifrost.dto.Line;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

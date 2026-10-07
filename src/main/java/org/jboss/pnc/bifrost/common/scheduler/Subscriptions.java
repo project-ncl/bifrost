@@ -17,18 +17,6 @@
  */
 package org.jboss.pnc.bifrost.common.scheduler;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.context.Context;
-import jakarta.annotation.PostConstruct;
-import org.jboss.pnc.bifrost.Config;
-import org.jboss.pnc.bifrost.common.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +29,20 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import org.jboss.pnc.bifrost.Config;
+import org.jboss.pnc.bifrost.common.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.opentelemetry.context.Context;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
