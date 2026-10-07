@@ -17,7 +17,15 @@
  */
 package org.jboss.pnc.bifrost.endpoint;
 
-import io.quarkus.test.junit.QuarkusTest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.api.bifrost.rest.Bifrost;
 import org.jboss.pnc.bifrost.common.Json;
@@ -28,13 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import io.quarkus.test.junit.QuarkusTest;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

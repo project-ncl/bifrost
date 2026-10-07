@@ -17,15 +17,7 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Parameters;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.Optional;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -34,7 +26,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Parameters;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @EqualsAndHashCode(exclude = "id", callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)

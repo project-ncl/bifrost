@@ -17,21 +17,6 @@
  */
 package org.jboss.pnc.bifrost.source;
 
-import io.quarkus.test.junit.QuarkusTest;
-import org.jboss.pnc.api.bifrost.dto.Line;
-import org.jboss.pnc.api.bifrost.enums.Direction;
-import org.jboss.pnc.bifrost.source.db.DatabaseSource;
-import org.jboss.pnc.bifrost.source.db.LogLine;
-import org.jboss.pnc.bifrost.test.DbUtils;
-import org.jboss.pnc.bifrost.test.Wait;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -44,6 +29,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+import org.jboss.pnc.bifrost.source.db.DatabaseSource;
+import org.jboss.pnc.bifrost.source.db.LogLine;
+import org.jboss.pnc.bifrost.test.DbUtils;
+import org.jboss.pnc.bifrost.test.Wait;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

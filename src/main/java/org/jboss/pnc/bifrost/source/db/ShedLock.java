@@ -17,12 +17,14 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
 @Table(name = "shedlock")

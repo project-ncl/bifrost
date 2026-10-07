@@ -17,12 +17,14 @@
  */
 package org.jboss.pnc.bifrost.source;
 
+import javax.sql.DataSource;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
+
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class ShedLockConfig {

@@ -17,15 +17,16 @@
  */
 package org.jboss.pnc.bifrost.source;
 
-import io.micrometer.core.annotation.Timed;
-import org.jboss.pnc.api.bifrost.dto.Line;
-import org.jboss.pnc.api.bifrost.enums.Direction;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+
+import io.micrometer.core.annotation.Timed;
 
 public interface Source {
 

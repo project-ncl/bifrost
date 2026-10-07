@@ -1,16 +1,17 @@
 package org.jboss.pnc.bifrost.common;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-import jakarta.validation.ValidationException;
-import jakarta.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import jakarta.validation.ValidationException;
+import jakarta.xml.bind.DatatypeConverter;
+
+import org.junit.jupiter.api.Test;
 
 class ChecksumValidatingStreamTest {
 

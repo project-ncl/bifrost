@@ -17,8 +17,16 @@
  */
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.quarkus.test.junit.QuarkusTest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.concurrent.Semaphore;
+
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.hibernate.Session;
@@ -35,14 +43,9 @@ import org.junit.jupiter.api.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.concurrent.Semaphore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

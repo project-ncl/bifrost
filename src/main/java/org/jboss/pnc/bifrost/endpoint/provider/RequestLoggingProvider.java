@@ -4,9 +4,11 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.extern.slf4j.Slf4j;
+
 import org.jboss.resteasy.reactive.server.ServerRequestFilter;
 import org.jboss.resteasy.reactive.server.ServerResponseFilter;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RequestLoggingProvider {

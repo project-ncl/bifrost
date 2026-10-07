@@ -17,15 +17,16 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jboss.pnc.bifrost.common.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
 
 public class JsonbJSONRPC2Response extends JSONRPC2Response {
 

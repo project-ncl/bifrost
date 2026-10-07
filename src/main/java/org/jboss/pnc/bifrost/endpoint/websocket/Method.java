@@ -17,10 +17,11 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import org.jboss.pnc.api.bifrost.dto.Line;
+import java.util.function.Consumer;
 
 import jakarta.websocket.Session;
-import java.util.function.Consumer;
+
+import org.jboss.pnc.api.bifrost.dto.Line;
 
 /**
  *

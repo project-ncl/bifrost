@@ -17,8 +17,11 @@
  */
 package org.jboss.pnc.bifrost;
 
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
+import java.io.IOException;
+
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+
 import org.jboss.pnc.bifrost.kafkaconsumer.Configuration;
 import org.jboss.pnc.bifrost.kafkaconsumer.StoredCounter;
 import org.jboss.pnc.common.Strings;
@@ -26,9 +29,8 @@ import org.jboss.pnc.common.concurrent.Sequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
-import java.io.IOException;
+import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

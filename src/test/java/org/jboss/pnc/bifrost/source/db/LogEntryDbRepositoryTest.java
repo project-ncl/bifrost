@@ -1,14 +1,15 @@
 package org.jboss.pnc.bifrost.source.db;
 
-import io.quarkus.test.junit.QuarkusTest;
-import org.jboss.pnc.common.Random;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.jboss.pnc.common.Random;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 class LogEntryDbRepositoryTest {

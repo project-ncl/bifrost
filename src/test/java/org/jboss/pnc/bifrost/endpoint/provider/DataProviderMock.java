@@ -17,14 +17,6 @@
  */
 package org.jboss.pnc.bifrost.endpoint.provider;
 
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.quarkus.test.Mock;
-import org.jboss.pnc.api.bifrost.dto.Line;
-import org.jboss.pnc.api.bifrost.enums.Direction;
-
-import jakarta.enterprise.context.ApplicationScoped;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Deque;
@@ -32,6 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.jboss.pnc.api.bifrost.dto.Line;
+import org.jboss.pnc.api.bifrost.enums.Direction;
+
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.test.Mock;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

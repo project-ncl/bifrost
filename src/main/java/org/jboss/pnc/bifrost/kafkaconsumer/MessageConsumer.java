@@ -17,28 +17,30 @@
  */
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.smallrye.common.annotation.Blocking;
+import static org.jboss.pnc.bifrost.common.Strings.sanitize;
+
+import java.util.List;
+
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.pnc.bifrost.source.db.LogEntryRepository;
 import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.List;
-
-import static org.jboss.pnc.bifrost.common.Strings.sanitize;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.smallrye.common.annotation.Blocking;
 
 /**
  * Consume from a Kafka topic, parse the data and store it in the database

@@ -17,10 +17,11 @@
  */
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

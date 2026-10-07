@@ -17,15 +17,15 @@
  */
 package org.jboss.pnc.bifrost.source.db;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.transaction.Transactional;
 
 import org.jboss.pnc.common.Strings;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

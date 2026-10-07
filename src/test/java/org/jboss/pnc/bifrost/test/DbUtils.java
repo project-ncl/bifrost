@@ -17,17 +17,18 @@
  */
 package org.jboss.pnc.bifrost.test;
 
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
 import org.jboss.pnc.bifrost.source.db.LogEntry;
 import org.jboss.pnc.bifrost.source.db.LogEntryLocalRepository;
 import org.jboss.pnc.bifrost.source.db.LogLevel;
 import org.jboss.pnc.bifrost.source.db.LogLine;
 import org.jboss.pnc.common.concurrent.Sequence;
-
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
-import java.util.Optional;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

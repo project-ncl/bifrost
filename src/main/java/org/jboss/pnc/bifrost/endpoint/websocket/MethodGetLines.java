@@ -17,10 +17,13 @@
  */
 package org.jboss.pnc.bifrost.endpoint.websocket;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+
 import org.jboss.pnc.api.bifrost.dto.Line;
 import org.jboss.pnc.api.bifrost.enums.Direction;
 import org.jboss.pnc.bifrost.common.scheduler.Subscriptions;
@@ -28,10 +31,9 @@ import org.jboss.pnc.bifrost.endpoint.provider.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.inject.Inject;
-import java.util.Optional;
-import java.util.function.Consumer;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

@@ -17,14 +17,16 @@
  */
 package org.jboss.pnc.bifrost.kafkaconsumer;
 
-import io.smallrye.config.ConfigMapping;
-import io.smallrye.config.WithDefault;
-import io.smallrye.config.WithName;
-import org.jboss.pnc.bifrost.source.db.LogLevel;
+import java.util.List;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
-import java.util.List;
+
+import org.jboss.pnc.bifrost.source.db.LogLevel;
+
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
+import io.smallrye.config.WithName;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

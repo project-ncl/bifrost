@@ -17,16 +17,18 @@
  */
 package org.jboss.pnc.bifrost.source;
 
-import io.quarkus.arc.All;
-import io.quarkus.arc.InstanceHandle;
+import java.util.List;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.jboss.pnc.bifrost.Config;
 import org.jboss.pnc.bifrost.common.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import java.util.List;
+import io.quarkus.arc.All;
+import io.quarkus.arc.InstanceHandle;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
