@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -53,6 +52,7 @@ import org.jboss.pnc.api.bifrost.dto.Checksums;
 import org.jboss.pnc.api.bifrost.rest.FinalLogRest;
 import org.jboss.pnc.api.constants.MDCHeaderKeys;
 import org.jboss.pnc.bifrost.common.ChecksumValidatingStream;
+import org.jboss.pnc.bifrost.constants.UserRoles;
 import org.jboss.pnc.bifrost.endpoint.dto.FinalLogUpload;
 import org.jboss.pnc.bifrost.source.db.FinalLog;
 import org.jboss.pnc.bifrost.source.db.LogEntry;
@@ -66,7 +66,7 @@ import io.quarkus.logging.Log;
 import io.quarkus.runtime.configuration.MemorySize;
 import lombok.extern.slf4j.Slf4j;
 
-@PermitAll
+@RolesAllowed({ UserRoles.USERS, UserRoles.USERS_ADMIN })
 @Slf4j
 public class FinalLogImpl implements FinalLogRest {
     @ConfigProperty(name = "quarkus.http.limits.max-body-size")
@@ -81,7 +81,7 @@ public class FinalLogImpl implements FinalLogRest {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @RolesAllowed({ "pnc-app-bifrost-final-log-create", "pnc-users-admin" })
+    @RolesAllowed({ UserRoles.BIFROST_FINAL_LOG_CREATE, UserRoles.USERS_ADMIN })
     @Transactional
     public String uploadFinalLog(@Valid FinalLogUpload logUpload, @Context HttpHeaders headers) {
         Log.info("Receiving logfile");
@@ -137,7 +137,7 @@ public class FinalLogImpl implements FinalLogRest {
 
     @Path("/{processContext}/delete")
     @DELETE
-    @RolesAllowed({ "pnc-app-bifrost-final-log-delete", "pnc-users-admin" })
+    @RolesAllowed({ UserRoles.BIFROST_FINAL_LOG_DELETE, UserRoles.USERS_ADMIN })
     @Transactional
     public Response deleteFinalLog(@PathParam("processContext") String processContext) {
         // parse process context

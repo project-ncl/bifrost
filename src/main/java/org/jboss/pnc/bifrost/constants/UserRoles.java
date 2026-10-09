@@ -19,9 +19,8 @@ package org.jboss.pnc.bifrost.constants;
 
 public class UserRoles {
 
-    /** Role used by all PNC human admins */
+    public static final String USERS = "pnc-users";
     public static final String USERS_ADMIN = "pnc-users-admin";
-
-    /** Role used by humans / service accounts that can upload logs to bifrost */
-    public static final String USERS_BIFROST = "pnc-app-bifrost-user";
+    public static final String BIFROST_FINAL_LOG_CREATE = "pnc-app-bifrost-final-log-create";
+    public static final String BIFROST_FINAL_LOG_DELETE = "pnc-app-bifrost-final-log-delete";
 }

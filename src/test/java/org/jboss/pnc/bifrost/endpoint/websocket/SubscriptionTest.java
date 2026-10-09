@@ -51,11 +51,13 @@ import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @QuarkusTest
+@TestSecurity(user = "testUser", roles = "pnc-users")
 public class SubscriptionTest {
 
     private static Logger logger = LoggerFactory.getLogger(SubscriptionTest.class);
