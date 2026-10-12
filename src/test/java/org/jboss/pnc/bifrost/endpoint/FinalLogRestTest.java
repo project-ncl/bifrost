@@ -18,8 +18,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 
 @QuarkusTest
+@TestSecurity(user = "testUser", roles = "pnc-users")
 public class FinalLogRestTest {
 
     private static final String text = "hahaha";

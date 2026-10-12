@@ -42,6 +42,13 @@ quarkus:
     auth:
       # required for LDAP: build-time property
       basic: true
+      policy:
+        role-policy-users:
+          roles-allowed: pnc-users,pnc-users-admin
+      permission:
+        socket:
+          paths: /socket
+          policy: role-policy-users
     port: 8081
     # gzip replies (only active for resteasy reactive)
     enable-compression: true

@@ -37,11 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 @QuarkusTest
+@TestSecurity(user = "testUser", roles = "pnc-users")
 public class RestErrorsTest {
 
     private static Logger logger = LoggerFactory.getLogger(RestErrorsTest.class);
