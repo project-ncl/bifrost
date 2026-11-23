@@ -1,6 +1,7 @@
 package org.jboss.pnc.bifrost.endpoint;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.nio.charset.StandardCharsets;
@@ -49,6 +50,22 @@ public class FinalLogRestTest {
                 .then()
                 .statusCode(200)
                 .body(is("" + text.length()));
+    }
+
+    @Test
+    public void malformedIdShouldReturn400() {
+        given().when().get("/final-log/abc/build-log").then().statusCode(400);
+        given().when().get("/final-log/abc/build-log/size").then().statusCode(400);
+        given().when().get("/final-log/abc/build-log/checksums").then().statusCode(400);
+    }
+
+    @Test
+    public void malformedIdResponseShouldEchoInput() {
+        given().when()
+                .get("/final-log/build-BSVKMABQBAAAA-/build-log/checksums")
+                .then()
+                .statusCode(400)
+                .body(containsString("build-BSVKMABQBAAAA-"));
     }
 
     private static LogEntry createLogEntry(long processContext, String processContextVariant) {

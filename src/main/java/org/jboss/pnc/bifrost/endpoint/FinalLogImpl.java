@@ -60,7 +60,6 @@ import org.jboss.pnc.bifrost.source.db.LogEntryRepository;
 import org.jboss.pnc.bifrost.source.db.converter.IdConverter;
 import org.jboss.pnc.bifrost.source.db.converter.ValueConverter;
 import org.jboss.pnc.common.concurrent.Sequence;
-import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.configuration.MemorySize;
@@ -164,7 +163,7 @@ public class FinalLogImpl implements FinalLogRest {
     @Override
     @Transactional
     public Response getFinalLog(@PathParam("buildId") String buildId, @PathParam("tag") String tag) {
-        Long context = LongBase32IdConverter.toLong(buildId);
+        Long context = idConverter.convert(buildId);
         // if context is not present, return status 404
         if (!LogEntry.isPresent(context)) {
             return Response.status(404).build();
@@ -181,7 +180,7 @@ public class FinalLogImpl implements FinalLogRest {
             tempFile = File.createTempFile("final-log", ".tmp");
 
             try (FileOutputStream fout = new FileOutputStream(tempFile)) {
-                FinalLog.copyFinalLogsToOutputStream(LongBase32IdConverter.toLong(buildId), tag, fout);
+                FinalLog.copyFinalLogsToOutputStream(context, tag, fout);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -202,7 +201,7 @@ public class FinalLogImpl implements FinalLogRest {
 
     @Override
     public long getFinalLogSize(@PathParam("buildId") String buildId, @PathParam("tag") String tag) {
-        return FinalLog.getFinalLogsWithoutPreviousRetries(LongBase32IdConverter.toLong(buildId), tag)
+        return FinalLog.getFinalLogsWithoutPreviousRetries(idConverter.convert(buildId), tag)
                 .stream()
                 .mapToLong(m -> m.size)
                 .sum();
