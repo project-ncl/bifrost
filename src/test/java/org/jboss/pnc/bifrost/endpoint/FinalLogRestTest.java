@@ -41,6 +41,19 @@ public class FinalLogRestTest {
     }
 
     @Test
+    public void missingEntryShouldReturn404ForAllEndpoints() {
+        given().when().get("/final-log/1234/build-log/size").then().statusCode(404);
+        given().when().get("/final-log/1234/build-log/checksums").then().statusCode(404);
+    }
+
+    @Test
+    public void existingEntryWithoutLogsForTagShouldReturnZeroSize() {
+        String sequenceString = LongBase32IdConverter.toString(processContext);
+
+        given().when().get("/final-log/" + sequenceString + "/other-tag/size").then().statusCode(200).body(is("0"));
+    }
+
+    @Test
     public void finalLogShouldReturn200() {
         String sequenceString = LongBase32IdConverter.toString(processContext);
 

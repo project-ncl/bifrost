@@ -200,8 +200,15 @@ public class FinalLogImpl implements FinalLogRest {
     }
 
     @Override
+    @Transactional
     public long getFinalLogSize(@PathParam("buildId") String buildId, @PathParam("tag") String tag) {
-        return FinalLog.getFinalLogsWithoutPreviousRetries(idConverter.convert(buildId), tag)
+        Long context = idConverter.convert(buildId);
+        // if context is not present, return status 404
+        if (!LogEntry.isPresent(context)) {
+            throw new NotFoundException();
+        }
+
+        return FinalLog.getFinalLogsWithoutPreviousRetries(context, tag)
                 .stream()
                 .mapToLong(m -> m.size)
                 .sum();
