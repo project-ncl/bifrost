@@ -17,6 +17,8 @@
  */
 package org.jboss.pnc.bifrost.source.db.converter;
 
+import jakarta.ws.rs.BadRequestException;
+
 import org.jboss.pnc.common.pnc.LongBase32IdConverter;
 
 /**
@@ -24,9 +26,18 @@ import org.jboss.pnc.common.pnc.LongBase32IdConverter;
  */
 public class IdConverter implements ValueConverter<Long> {
 
+    /**
+     * Converts a log identifier (optionally prefixed with <code>build-</code>) to its numeric form.
+     *
+     * @throws BadRequestException if the value is not a valid identifier. The message contains the raw input.
+     */
     @Override
     public Long convert(String value) {
-        return LongBase32IdConverter.toLong(stripPrefix(value));
+        try {
+            return LongBase32IdConverter.toLong(stripPrefix(value));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid log identifier '" + value + "': " + e.getMessage(), e);
+        }
     }
 
     private String stripPrefix(String processContext) {
